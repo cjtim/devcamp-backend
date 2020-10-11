@@ -1,33 +1,27 @@
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
-import dotenv from 'dotenv'
-dotenv.config({ path: './.env' })
+import CONST from './../const'
 
-const apikey = process.env.SCB_API_KEY
-const apisecret = process.env.SCB_API_SECRET_KEY
 const HEADERS = {
     'content-type': 'application/json',
     'accept-language': 'EN',
     'response-channel': 'mobile',
-    apikey: apikey,
-    resourceOwnerId: apikey,
-    apisecret: apisecret,
+    apikey: CONST.SCB_PUB_KEY,
+    resourceOwnerId: CONST.SCB_PUB_KEY,
+    apisecret: CONST.SCB_PRI_KEY,
     endState: 'mobile_app',
     channel: 'scbeasy',
 }
-const GET_TOKEN_API =
-    'https://api-sandbox.partners.scb/partners/sandbox/v1/oauth/token'
-const DEEPLINK_API =
-    'https://api-sandbox.partners.scb/partners/sandbox/v3/deeplink/transactions'
-const TRANSACTION_API =
-    'https://api-sandbox.partners.scb/partners/sandbox/v2/transactions'
+const GET_TOKEN_API = CONST.SCB_GET_TOKEN_API
+const DEEPLINK_API = CONST.SCB_DEEPLINK_API
+const TRANSACTION_API = CONST.SCB_TRANSACTION_API
 export class SCBServices {
     static async getToken(requestUID?: string) {
         const getToken = await axios.post(
             GET_TOKEN_API,
             {
-                applicationKey: apikey,
-                applicationSecret: apisecret,
+                applicationKey: CONST.SCB_PUB_KEY,
+                applicationSecret: CONST.SCB_PRI_KEY,
             },
             { headers: { ...HEADERS, requestUId: requestUID } }
         )
@@ -38,9 +32,9 @@ export class SCBServices {
             const requestUID = uuidv4()
             console.log('requestUID ' + requestUID)
             const orderId = requestUID.slice(0, 8)
-            const callbackUrl = 'https://tims-linebot-scb-api-nwbwsoebza-an.a.run.app/pay/success/' + orderId
+            const callbackUrl = CONST.PAYMENT_RETURN_URL + '/' + orderId
             const accessToken = await this.getToken(requestUID)
-            console.log("AccessToken " + accessToken)
+            console.log('AccessToken ' + accessToken)
 
             const orderPayload = {
                 transactionType: 'PURCHASE',
@@ -82,16 +76,19 @@ export class SCBServices {
         try {
             const requestUID = uuidv4()
             const accessToken = await this.getToken(requestUID)
-            const payload = await axios.get(TRANSACTION_API + `/${tranactionId}`, {
-                headers: {
-                    ...HEADERS,
-                    requestUId: requestUID,
-                    authorization: `Bearer ${accessToken}`,
-                },
-            })
+            const payload = await axios.get(
+                TRANSACTION_API + `/${tranactionId}`,
+                {
+                    headers: {
+                        ...HEADERS,
+                        requestUId: requestUID,
+                        authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            )
             console.log(payload.data.data)
             if (payload.data.data.statusCode === 1) {
-                return true;
+                return true
             }
         } catch (error) {
             console.error(error.message)

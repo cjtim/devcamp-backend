@@ -1,7 +1,5 @@
 import { Request, Response, Router } from 'express'
 const router = Router({ strict: true, caseSensitive: true })
-import dotenv from 'dotenv'
-dotenv.config({ path: './.env' })
 import { v4 as uuidv4 } from 'uuid'
 import OmiseController from './controllers/omise.controller'
 

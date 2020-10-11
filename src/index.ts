@@ -19,9 +19,3 @@ app.use(router)
 app.listen(process.env.PORT, () => {
     console.log(`it's works!,checkit out! http://localhost:${process.env.PORT}`)
 })
-
-// OmiseServices.createPrompPay(2000)
-// OmiseServices.search()
-// (async() => {
-//     console.log(await BucketServices.add('nodejs/', 'package.json'))
-// })()

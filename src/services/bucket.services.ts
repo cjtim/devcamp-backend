@@ -1,11 +1,10 @@
 import { Storage, UploadOptions } from '@google-cloud/storage'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
-import dotenv from 'dotenv'
-dotenv.config({ path: './.env' })
-const FIREBASE_ACCOUNT = __dirname + '/../../firebaseServiceAcc.json'
-const storage = new Storage({keyFilename: FIREBASE_ACCOUNT})
-const bucket = storage.bucket(process.env.BUCKET_NAME || '')
+import CONST from './../const'
+
+const storage = new Storage({credentials: CONST.FIREBASE_ACC})
+const bucket = storage.bucket(CONST.BUCKET_NAME)
 export default class BucketServices {
     static async add(
         parentPath: string,

@@ -2,23 +2,24 @@ import dotenv from 'dotenv'
 dotenv.config({ path: './.env' })
 import axios from 'axios'
 import * as omise from 'omise'
+import CONST from './../const'
 
 const Omise = omise.default({
-    publicKey: process.env.OMISE_PUB_KEY || '',
-    secretKey: process.env.OMISE_PRIVATE_KEY || '',
+    publicKey: CONST.OMISE_PUB_KEY,
+    secretKey: CONST.OMISE_PRI_KEY,
     omiseVersion: '2019-05-29',
 })
 const HEADERS = {
-    authorization: `Basic ${Buffer.from(
-        process.env.OMISE_PRIVATE_KEY || ''
-    ).toString('base64')}`,
+    authorization: `Basic ${Buffer.from(CONST.OMISE_PRI_KEY).toString(
+        'base64'
+    )}`,
 }
 
 const chargeInstance = axios.create({
-    baseURL: 'https://api.omise.co/',
+    baseURL: CONST.OMISE_API_URL,
     headers: HEADERS,
 })
-const RETURN_URI = 'https://cjtim.com/pay/success/'
+const RETURN_URI = CONST.PAYMENT_RETURN_URL
 export default class OmiseServices {
     static async createPromptPay(amount: number, orderId: string) {
         try {
@@ -32,9 +33,9 @@ export default class OmiseServices {
                     currency: 'THB',
                 },
                 description: 'restaurant1',
-                return_uri: RETURN_URI + orderId,
+                return_uri: RETURN_URI + '/' + orderId,
             }
-            const charges = await chargeInstance.post('charges', payload)
+            const charges = await chargeInstance.post('/charges', payload)
             return charges.data.authorize_uri
         } catch (error) {
             console.error(error.message)
@@ -49,13 +50,13 @@ export default class OmiseServices {
         const payload = {
             amount: amount,
             currency: 'THB',
-            return_uri: RETURN_URI + orderId,
+            return_uri: RETURN_URI + '/' + orderId,
             source: {
                 type: 'truemoney',
                 phone_number: phoneNumber,
             },
         }
-        const charges = await chargeInstance.post('charges', payload)
+        const charges = await chargeInstance.post('/charges', payload)
         return charges
     }
     static async createBank(
@@ -64,32 +65,32 @@ export default class OmiseServices {
         orderId: string
     ) {
         try {
-
             amount = amount * 100
             const payload = {
                 amount: amount,
                 currency: 'THB',
-                return_uri: RETURN_URI + orderId,
+                return_uri: RETURN_URI + '/' + orderId,
                 source: {
                     type: 'internet_banking_' + bankSource.toLowerCase(),
                 },
             }
-            const charges = await chargeInstance.post('charges', payload)
+            const charges = await chargeInstance.post('/charges', payload)
             return charges.data.authorize_uri
         } catch (error) {
-            console.error("error in createBank " + error.message)
+            console.error('error in createBank ' + error.message)
         }
     }
     static async search() {
         try {
             const payload = await chargeInstance.get(
-                'search?filters[status]=successful', {
+                '/search?filters[status]=successful',
+                {
                     params: {
                         scope: 'charge',
                         query: {
-                            description: 'restaurant1'
-                        }
-                    }
+                            description: 'restaurant1',
+                        },
+                    },
                 }
             )
             console.log(payload.data)
@@ -98,7 +99,7 @@ export default class OmiseServices {
             console.error(error)
         }
     }
-    static async isPaid(chargesId: string){
+    static async isPaid(chargesId: string) {
         try {
             const payload = await Omise.charges.retrieve(chargesId)
             if (payload.paid) {
@@ -113,8 +114,9 @@ export default class OmiseServices {
         try {
             const chargesDetail = await Omise.charges.retrieve(chargesId)
             const refund = await chargeInstance.post(
-                `charges/${chargesId}/refunds/`, {
-                    amount: chargesDetail.amount
+                `/charges/${chargesId}/refunds/`,
+                {
+                    amount: chargesDetail.amount,
                 }
             )
             return refund.data
@@ -124,17 +126,18 @@ export default class OmiseServices {
     }
     static async createCharge(sourceId: string, orderId: string) {
         try {
-            const source = await chargeInstance.get('sources/' + sourceId)
+            const source = await chargeInstance.get('/sources/' + sourceId)
             const payload = {
                 amount: source.data.amount,
                 currency: 'THB',
-                return_uri: RETURN_URI + orderId,
-                source: sourceId
+                return_uri: RETURN_URI + '/' + orderId,
+                source: sourceId,
             }
-            const charge = await chargeInstance.post('charges/', payload)
+            const charge = await chargeInstance.post('/charges/', payload)
             return charge.data.authorize_uri
         } catch (error) {
             console.error(error.message)
         }
     }
+    static async chargeCreditCard(token: string, amount: number) {}
 }

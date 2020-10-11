@@ -1,7 +1,7 @@
 import * as firebase from 'firebase/app'
 import 'firebase/database'
-const firebaseServiceAcc = require('../../firebaseServiceAcc.json')
-firebase.initializeApp(firebaseServiceAcc)
+import CONST from './../const'
+firebase.initializeApp(CONST.FIREBASE_ACC)
 const database = firebase.database()
 export default class DatabaseServices {
     static async set(path: string, data: object): Promise<any>{
