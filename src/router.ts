@@ -15,6 +15,7 @@ router.post('/payment/ktb/create', OmiseController.createKTB)
 router.post('/payment/bay/create', OmiseController.createBAY)
 router.get('/payment/ispaid/:chargesId', OmiseController.isPaid)
 router.get('/payment/refund/:chargesId', OmiseController.refund) // This is dangerous, don't use on production
+router.post('/payment/charges/create', OmiseController.createCharges)
 
 router.get('/uuid', (req,res) => res.json(uuidv4()))
 router.post('/omise/webhook', OmiseController.webhookHandle)
