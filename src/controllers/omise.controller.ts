@@ -27,7 +27,7 @@ export default class OmiseController {
         const { amount, orderId } = req.body
         res.json(await OmiseServices.createBank(amount, 'bay', orderId))
     }
-    static async isPaid(req: Request, res: Response){
+    static async isPaid(req: Request, res: Response) {
         const { chargesId } = req.params
         res.json(await OmiseServices.isPaid(chargesId))
     }
@@ -35,5 +35,9 @@ export default class OmiseController {
     static async refund(req: Request, res: Response) {
         const { chargesId } = req.params
         res.json(await OmiseServices.refund(chargesId))
+    }
+    static async createCharges(req: Request, res: Response) {
+        const { source } = req.body
+        res.json(await OmiseServices.createCharge(source, '001'))
     }
 }

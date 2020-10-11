@@ -122,4 +122,19 @@ export default class OmiseServices {
             console.error(error.response.data)
         }
     }
+    static async createCharge(sourceId: string, orderId: string) {
+        try {
+            const source = await chargeInstance.get('sources/' + sourceId)
+            const payload = {
+                amount: source.data.amount,
+                currency: 'THB',
+                return_uri: RETURN_URI + orderId,
+                source: sourceId
+            }
+            const charge = await chargeInstance.post('charges/', payload)
+            return charge.data.authorize_uri
+        } catch (error) {
+            console.error(error.message)
+        }
+    }
 }
