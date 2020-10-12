@@ -6,10 +6,10 @@ export default class LineMiddleware {
         try {
             const accessToken = req.headers.authorization?.split(' ')[1] || ''
             if (LineService.isTokenValid(accessToken)) {
-                req.user = LineService.getProfile(accessToken)
+                req.user = await LineService.getProfile(accessToken)
                 console.log(req.user)
+                next()
             }
-            next()
         } catch (e) {
             res.status(403).send('Access Denied')
             console.log(e.message)
