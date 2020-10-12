@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as line from '@line/bot-sdk'
 import CONST from './../const'
+import { Message } from '@line/bot-sdk/dist/types'
 
 const config = {
     channelAccessToken: CONST.LINE_CHANNEL_TOKEN,
@@ -48,7 +49,13 @@ export default class LineService {
                 type: 'text',
                 text: message,
             })
-
+        } catch (e) {
+            console.error('Cannot send message ' + e.message)
+        }
+    }
+    static async sendMessageRaw(lineUid: string, json: Message | Message[]) {
+        try {
+            return await client.pushMessage(lineUid, json)
         } catch (e) {
             console.error('Cannot send message ' + e.message)
         }

@@ -5,6 +5,7 @@ import OmiseController from './controllers/omise.controller'
 import * as line from '@line/bot-sdk'
 import CONST from './const'
 import LineMiddleware from './middleware/line.middleware'
+import PaymentController from './controllers/payment.controller'
 
 const config = {
     channelAccessToken: CONST.LINE_CHANNEL_TOKEN,
@@ -13,17 +14,13 @@ const config = {
 router.get('/', hi)
 router.post('/', hi)
 
-router.post('/payment/promptpay/create', OmiseController.createPromptPay)
-router.post('/payment/scb/create', OmiseController.createSCB)
-router.post('/payment/bbl/create', OmiseController.createBBL)
-router.post('/payment/ktb/create', OmiseController.createKTB)
-router.post('/payment/bay/create', OmiseController.createBAY)
-router.get('/payment/ispaid/:chargesId', OmiseController.isPaid)
-router.get('/payment/refund/:chargesId', OmiseController.refund) // This is dangerous, don't use on production
+router.post('/payment/promptpay/create', PaymentController.createPromptPay)
+// router.get('/payment/ispaid/:chargesId', PaymentController.isPaid)
+// router.get('/payment/refund/:chargesId', PaymentController.refund) // This is dangerous, don't use on production
 router.post(
     '/payment/charges/create',
     LineMiddleware.liffVerify,
-    OmiseController.createCharges
+    PaymentController.createPayment
 )
 
 router.get('/uuid', (req, res) => res.json(uuidv4()))

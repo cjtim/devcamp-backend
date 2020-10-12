@@ -41,45 +41,6 @@ export default class OmiseServices {
             console.error(error.message)
         }
     }
-    static async createTrueMoney(
-        amount: number,
-        phoneNumber: string,
-        orderId: string
-    ) {
-        amount = amount * 100
-        const payload = {
-            amount: amount,
-            currency: 'THB',
-            return_uri: RETURN_URI + '/' + orderId,
-            source: {
-                type: 'truemoney',
-                phone_number: phoneNumber,
-            },
-        }
-        const charges = await chargeInstance.post('/charges', payload)
-        return charges
-    }
-    static async createBank(
-        amount: number,
-        bankSource: string,
-        orderId: string
-    ) {
-        try {
-            amount = amount * 100
-            const payload = {
-                amount: amount,
-                currency: 'THB',
-                return_uri: RETURN_URI + '/' + orderId,
-                source: {
-                    type: 'internet_banking_' + bankSource.toLowerCase(),
-                },
-            }
-            const charges = await chargeInstance.post('/charges', payload)
-            return charges.data.authorize_uri
-        } catch (error) {
-            console.error('error in createBank ' + error.message)
-        }
-    }
     static async search() {
         try {
             const payload = await chargeInstance.get(
@@ -124,6 +85,14 @@ export default class OmiseServices {
             console.error(error.response.data)
         }
     }
+    static async getCharge(chargeId: string) {
+        try {
+            const chargePayload = await chargeInstance.get('/charges/' + chargeId)
+            return chargePayload.data
+        } catch (e) {
+            throw new Error('cannot get charge ' + chargeId + e.message)
+        }
+    }
     static async createCharge(sourceId: string, orderId: string) {
         try {
             const source = await chargeInstance.get('/sources/' + sourceId)
@@ -134,7 +103,7 @@ export default class OmiseServices {
                 source: sourceId,
             }
             const charge = await chargeInstance.post('/charges/', payload)
-            return charge.data.authorize_uri
+            return { ...charge.data, payment_url: charge.data.authorize_uri }
         } catch (error) {
             console.error(error.message)
         }
