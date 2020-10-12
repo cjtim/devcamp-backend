@@ -4,7 +4,7 @@ const CONSTANT = {
     OMISE_API_URL: 'https://api.omise.co',
     OMISE_PUB_KEY: process.env.OMISE_PUB_KEY || '',
     OMISE_PRI_KEY: process.env.OMISE_PRIVATE_KEY || '',
-    PAYMENT_RETURN_URL: 'https://cjtim.com/pay/success',
+    PAYMENT_RETURN_URL: 'https://liff.line.me/1655050462-nZ59d8z5/payment/success',
     BUCKET_NAME: process.env.BUCKET_NAME || '',
     FIREBASE_ACC: require('./../firebaseServiceAcc.json'),
     FIREBASE_DB: process.env.FIREBASE_DB || '',
