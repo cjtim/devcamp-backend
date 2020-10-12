@@ -17,12 +17,12 @@ export default class DatabaseServices {
     //     }
     // }
     static async put(path: string, data: object) {
-        const payload = database.ref(path)
-        return await payload.update(data)
+        const payload = await database.ref(path).update(data)
+        return payload
     }
     static async get(path: string): Promise<object> {
         const payload = await database.ref(path).once('value')
-        return payload
+        return payload.exportVal()
     }
     static async delete(path: string): Promise<boolean> {
         try {
