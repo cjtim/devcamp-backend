@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
+import LineService from '../services/line.services'
 import OmiseServices from '../services/omise.services'
+import { RequestWithUser } from '../utils/type'
 
 export default class OmiseController {
     static async webhookHandle(req: Request, res: Response) {
@@ -36,8 +38,10 @@ export default class OmiseController {
         const { chargesId } = req.params
         res.json(await OmiseServices.refund(chargesId))
     }
-    static async createCharges(req: Request, res: Response) {
+    static async createCharges(req: any, res: Response) {
         const { source } = req.body
-        res.json(await OmiseServices.createCharge(source, '001'))
+        const payment_url = await OmiseServices.createCharge(source, '001')
+        await LineService.sendMessage(req.user.lineUserId, 'Transaction pending..' + payment_url)
+        res.json(payment_url)
     }
 }

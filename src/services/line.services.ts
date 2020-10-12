@@ -1,5 +1,13 @@
 import axios from 'axios'
+import * as line from '@line/bot-sdk'
 import CONST from './../const'
+
+const config = {
+    channelAccessToken: CONST.LINE_CHANNEL_TOKEN,
+    channelSecret: CONST.LINE_CHANNEL_SECRET,
+}
+
+const client = new line.Client(config)
 export default class LineService {
     static async isTokenValid(accessToken: string) {
         try {
@@ -33,5 +41,11 @@ export default class LineService {
         } catch (e) {
             throw new Error('Cannot get line profile' + e.message)
         }
+    }
+    static async sendMessage(lineUid: string, message: string) {
+        return client.multicast([lineUid], {
+            type: 'text',
+            text: message,
+        })
     }
 }

@@ -16,6 +16,8 @@ const CONSTANT = {
     SCB_TRANSACTION_API:
         'https://api-sandbox.partners.scb/partners/sandbox/v2/transactions',
     LINE_VERIFY_LIFF_TOKEN_API: 'https://api.line.me/oauth2/v2.1/verify?access_token=',
-    LINE_GET_PROFILE_API: 'https://api.line.me/v2/profile'
+    LINE_GET_PROFILE_API: 'https://api.line.me/v2/profile',
+    LINE_CHANNEL_TOKEN: process.env.LINE_CHANNEL_TOKEN || '',
+    LINE_CHANNEL_SECRET: process.env.LINE_CHANNEL_SECRET || '' 
 }
 export default CONSTANT
