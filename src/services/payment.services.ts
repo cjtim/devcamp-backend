@@ -15,6 +15,7 @@ export default class PaymentServices {
             const databasePath = `/chargesId/${chargePayload.id}`
             await DatabaseServices.put(databasePath, {...chargePayload, userId: userId, orderId: orderId})
             const databasePayload: any = await DatabaseServices.get(databasePath)
+            console.log(databasePayload)
             return databasePayload
         } catch (e) {
             throw new Error('Cannot create order ' + e.message)
