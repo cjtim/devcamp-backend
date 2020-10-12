@@ -40,8 +40,9 @@ export default class OmiseController {
     }
     static async createCharges(req: any, res: Response) {
         const { source } = req.body
+        console.log('userId '+ req.user.lineUserId )
         const payment_url = await OmiseServices.createCharge(source, '001')
-        await LineService.sendMessage(req.user.lineUserId, 'Transaction pending..' + payment_url)
         res.json(payment_url)
+        await LineService.sendMessage(req.user.lineUserId, 'Transaction pending..' + payment_url)
     }
 }
