@@ -43,9 +43,14 @@ export default class LineService {
         }
     }
     static async sendMessage(lineUid: string, message: string) {
-        return client.multicast([lineUid], {
-            type: 'text',
-            text: message,
-        })
+        try {
+            return await client.pushMessage(lineUid, {
+                type: 'text',
+                text: message,
+            })
+
+        } catch (e) {
+            console.error('Cannot send message ' + e.message)
+        }
     }
 }
