@@ -1,11 +1,11 @@
-import * as firebase from 'firebase/app'
+import * as admin from 'firebase-admin'
 import 'firebase/database'
 import CONST from '../const'
-firebase.initializeApp({
-    credential: CONST.FIREBASE_ACC,
+admin.initializeApp({
+    credential: admin.credential.cert(CONST.FIREBASE_ACC),
     databaseURL: CONST.FIREBASE_DB,
 })
-const database = firebase.database()
+const database = admin.database()
 export default class DatabaseServices {
     // dangerous to use, overide exist data
     // static async set(path: string, data: object): Promise<any> {

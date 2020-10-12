@@ -13,7 +13,8 @@ export default class PaymentServices {
                 orderId
             )
             const databasePath = `/chargesId/${chargePayload.id}`
-            const databasePayload = await DatabaseServices.put(databasePath, {...chargePayload, userId: userId, orderId: orderId})
+            await DatabaseServices.put(databasePath, {...chargePayload, userId: userId, orderId: orderId})
+            const databasePayload: any = await DatabaseServices.get(databasePath)
             return databasePayload.payment_url
         } catch (e) {
             throw new Error('Cannot create order ' + e.message)
@@ -24,7 +25,8 @@ export default class PaymentServices {
             const chargePayload = await OmiseServices.getCharge(chargeId)
             if (chargePayload.paid) {
                 const databasePath = `/chargesId/${chargePayload.id}`
-                const databasePayload = await DatabaseServices.put(databasePath, chargePayload)
+                await DatabaseServices.put(databasePath, chargePayload)
+                const databasePayload: any = await DatabaseServices.get(databasePath)
                 const orderId = databasePayload.orderId
                 await LineService.sendMessageRaw(databasePayload.userId, flexRecipe)
                 return
