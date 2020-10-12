@@ -13,7 +13,7 @@ export default class PaymentController {
     static async webhookChargeComplete(req: any, res: Response) {
         try {
             const chargePayload = req.body
-            PaymentServices.userCompleteOrder(chargePayload.id)
+            PaymentServices.userCompleteOrder(chargePayload.data.id)
             res.status(200)
         } catch (e) {
             throw new Error('error webhookChargeComplete ' + e.message)
