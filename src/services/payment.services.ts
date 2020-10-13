@@ -3,33 +3,51 @@ import OmiseServices from './omise.services'
 import { v4 as uuidv4 } from 'uuid'
 import LineService from './line.services'
 import { FlexMessage } from '@line/bot-sdk/dist/types'
+import { Charges, Sources } from 'omise'
 
 export default class PaymentServices {
-    static async createOrder(userId: string, sourceId: string) {
+    static async createCharge(userId: string, sourceId: string) {
+        // create Omise charge
+        // save charges payload, userId to database
+        // return charge
         try {
             const orderId = uuidv4()
-            const chargePayload = await OmiseServices.createCharge(
+            const chargePayload: any = await OmiseServices.createCharge(
                 sourceId,
                 orderId
             )
-            const databasePath = `/chargesId/${chargePayload.id}`
-            await DatabaseServices.put(databasePath, {...chargePayload, userId: userId, orderId: orderId})
-            const databasePayload: any = await DatabaseServices.get(databasePath)
+            const databasePayload = await DatabaseServices.saveChargePayload(userId, chargePayload)
             return databasePayload
         } catch (e) {
             throw new Error('Cannot create order ' + e.message)
         }
     }
+    static async createPromptPay(userId: string, amount: number) {
+        // create promptpay source
+        // create charge
+        // save to database
+        try {
+            const orderId = uuidv4()
+            const sourcePayload: Sources.ISource = await OmiseServices.createPromptPaySource(amount)
+            const chargePayload: any = await this.createCharge(sourcePayload.id, orderId)
+            const databasePayload = await DatabaseServices.saveChargePayload(chargePayload, userId)
+            return databasePayload
+        } catch (e) {
+            throw new Error('cannot create PromptPay ' + e.message)
+        }
+    }
     static async userCompleteOrder(chargeId: string) {
         try {
-            const chargePayload = await OmiseServices.getCharge(chargeId)
+            const chargePayload: Charges.ICharge = await OmiseServices.getCharge(
+                chargeId
+            )
             if (chargePayload.paid) {
-                const databasePath = `/chargesId/${chargePayload.id}`
-                await DatabaseServices.put(databasePath, chargePayload)
-                const databasePayload: any = await DatabaseServices.get(databasePath)
-                const orderId = databasePayload.orderId
-                await LineService.sendMessageRaw(databasePayload.userId, flexRecipe)
-                return
+                const databasePayload = await DatabaseServices.saveChargePayload(chargePayload)
+                const orderId: string = databasePayload.orderId
+                await LineService.sendMessageRaw(
+                    databasePayload.userId,
+                    flexRecipe
+                )
             }
         } catch (e) {
             throw new Error('Cannot verify userCompleteOrder ' + e.message)

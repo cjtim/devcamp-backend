@@ -14,7 +14,11 @@ const config = {
 router.get('/', hi)
 router.post('/', hi)
 
-router.post('/payment/promptpay/create', PaymentController.createPromptPay)
+router.post(
+    '/payment/promptpay/create',
+    LineMiddleware.liffVerify,
+    PaymentController.createPromptPay
+)
 // router.get('/payment/ispaid/:chargesId', PaymentController.isPaid)
 // router.get('/payment/refund/:chargesId', PaymentController.refund) // This is dangerous, don't use on production
 router.post(
@@ -25,11 +29,13 @@ router.post(
 
 router.get('/uuid', (req, res) => res.json(uuidv4()))
 router.post('/omise/webhook', OmiseController.webhookHandle)
-router.post('/line/webhook', line.middleware(config), (req, res) => res.status(200))
+router.post('/line/webhook', line.middleware(config), (req, res) =>
+    res.status(200)
+)
 
 function hi(req: Request, res: Response) {
     if (JSON.stringify(req.body) === '{}') res.send('No req.body :(')
-    else res.send(req.body)
+    else res.status(200).send(req.body)
 }
 
 export default router

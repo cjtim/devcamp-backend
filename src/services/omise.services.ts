@@ -1,8 +1,10 @@
 import dotenv from 'dotenv'
 dotenv.config({ path: './.env' })
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import * as omise from 'omise'
 import CONST from './../const'
+import { Charges, Sources } from 'omise/types/index'
+import e from 'express'
 
 const Omise = omise.default({
     publicKey: CONST.OMISE_PUB_KEY,
@@ -21,27 +23,20 @@ const chargeInstance = axios.create({
 })
 const RETURN_URI = CONST.PAYMENT_RETURN_URL
 export default class OmiseServices {
-    static async createPromptPay(amount: number, orderId: string) {
+    static async createPromptPaySource(amount: number): Promise<Sources.ISource> {
         try {
             amount = amount * 100
-            const payload = {
+            const sourcePayload: Sources.ISource = await Omise.sources.create({
+                type: 'promptpay',
                 amount: amount,
                 currency: 'THB',
-                source: {
-                    type: 'promptpay',
-                    amount: amount,
-                    currency: 'THB',
-                },
-                description: 'restaurant1',
-                return_uri: RETURN_URI + '/' + orderId,
-            }
-            const charges = await chargeInstance.post('/charges', payload)
-            return charges.data.authorize_uri
+            })
+            return sourcePayload
         } catch (error) {
-            console.error(error.message)
+            throw new Error('cannot create Charge Promptpay ' + error.message)
         }
     }
-    static async search() {
+    static async search(): Promise<AxiosResponse | undefined> {
         try {
             const payload = await chargeInstance.get(
                 '/search?filters[status]=successful',
@@ -54,58 +49,56 @@ export default class OmiseServices {
                     },
                 }
             )
-            console.log(payload.data)
             return payload.data
         } catch (error) {
             console.error(error)
         }
     }
-    static async isPaid(chargesId: string) {
+    static async isPaid(chargesId: string): Promise<boolean> {
         try {
-            const payload = await Omise.charges.retrieve(chargesId)
+            const payload: Charges.ICharge = await Omise.charges.retrieve(chargesId)
             if (payload.paid) {
                 return true
             }
         } catch (error) {
-            console.error(error.message)
+            console.log('cannot find isPaid ' + error.message)
         }
         return false
     }
-    static async refund(chargesId: string) {
+    static async refund(chargesId: string): Promise<Charges.IRefundResponse>  {
         try {
-            const chargesDetail = await Omise.charges.retrieve(chargesId)
-            const refund = await chargeInstance.post(
-                `/charges/${chargesId}/refunds/`,
-                {
-                    amount: chargesDetail.amount,
-                }
-            )
-            return refund.data
+            const chargesDetail: Charges.ICharge = await Omise.charges.retrieve(chargesId)
+            const refund: Charges.IRefundResponse = await Omise.charges.createRefund(chargesId, {
+                amount: chargesDetail.amount
+            })
+            return refund
         } catch (error) {
-            console.error(error.response.data)
+            throw new Error('Cannot refund ' + chargesId + error.message)
         }
     }
-    static async getCharge(chargeId: string) {
+    static async getCharge(chargeId: string): Promise<any> {
         try {
-            const chargePayload = await chargeInstance.get('/charges/' + chargeId)
-            return chargePayload.data
+            const response: AxiosResponse = await chargeInstance.get('/charges/' + chargeId)
+            const chargePayload = response.data
+            return chargePayload
         } catch (e) {
             throw new Error('cannot get charge ' + chargeId + e.message)
         }
     }
-    static async createCharge(sourceId: string, orderId: string) {
+    static async createCharge(sourceId: string, orderId: string): Promise<any> {
         try {
-            const source = await chargeInstance.get('/sources/' + sourceId)
-            const payload = {
+            const source: AxiosResponse = await chargeInstance.get('/sources/' + sourceId)
+            const payload: Charges.IRequest = {
                 amount: source.data.amount,
                 currency: 'THB',
                 return_uri: RETURN_URI + '/' + orderId,
                 source: sourceId,
             }
-            const charge = await chargeInstance.post('/charges/', payload)
-            return { ...charge.data, payment_url: charge.data.authorize_uri }
+            const response: AxiosResponse = await chargeInstance.post('/charges/', payload)
+            const chargePayload = response.data
+            return chargePayload
         } catch (error) {
-            console.error(error.message)
+            throw new Error('cannot create Charge from source ' + sourceId + error.message)
         }
     }
     static async chargeCreditCard(token: string, amount: number) {}

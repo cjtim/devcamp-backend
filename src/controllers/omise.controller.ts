@@ -1,6 +1,4 @@
 import { Request, Response } from 'express'
-import LineService from '../services/line.services'
-import OmiseServices from '../services/omise.services'
 import PaymentController from './payment.controller'
 
 export default class OmiseController {
