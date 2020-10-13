@@ -25,7 +25,7 @@ const RETURN_URI = CONST.PAYMENT_RETURN_URL
 export default class OmiseServices {
     static async createPromptPaySource(amount: number): Promise<Sources.ISource> {
         try {
-            amount = amount * 100
+            amount = amount
             const sourcePayload: Sources.ISource = await Omise.sources.create({
                 type: 'promptpay',
                 amount: amount,
@@ -104,7 +104,7 @@ export default class OmiseServices {
     static async createChargeFromToken(cardToken: string, orderId: string, amount: number) {
         try {
             const payload: Charges.IRequest = {
-                amount: amount * 100,
+                amount: amount,
                 currency: 'THB',
                 return_uri: RETURN_URI + '/' + orderId,
                 card: cardToken,
