@@ -104,7 +104,7 @@ export default class OmiseServices {
     static async createChargeFromToken(cardToken: string, orderId: string, amount: number) {
         try {
             const payload: Charges.IRequest = {
-                amount: amount,
+                amount: amount * 100,
                 currency: 'THB',
                 return_uri: RETURN_URI + '/' + orderId,
                 card: cardToken,

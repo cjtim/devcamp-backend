@@ -1,6 +1,4 @@
 import { Response } from 'express'
-import { Charges, Sources } from 'omise'
-import OmiseServices from '../services/omise.services'
 import PaymentServices from '../services/payment.services'
 
 export default class PaymentController {
@@ -8,12 +6,19 @@ export default class PaymentController {
         try {
             const { source, amount }: { source: string, amount: number} = req.body
             const userId = req.user.lineUserId
-    
-            const chargePayload = await PaymentServices.createChargeFromSource(userId, source, amount)
+            let chargePayload: any
+
+            if (source.startsWith('tokn')) {
+                chargePayload = await PaymentServices.chargeCreditCardFromToken(userId, source, amount)
+                PaymentServices.userCompleteOrder(chargePayload.id)
+            } else {
+                chargePayload = await PaymentServices.createChargeFromSource(userId, source)
+            }
+
             const paymentUrl = chargePayload.authorize_uri
             res.json(paymentUrl)
         } catch (e) {
-            throw new Error('cannot create charge from omise form ' + e.message)
+            res.status(400).send(e.message)
         }
     }
     static async webhookChargeComplete(req: any, res: Response) {
@@ -34,7 +39,7 @@ export default class PaymentController {
             res.json(paymentUrl)
 
         } catch (e) {
-            throw new Error('cannot create promptpay ' + e.message)
+            res.status(400).send(e.message)
         }
     }
 }

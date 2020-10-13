@@ -6,29 +6,64 @@ import { FlexMessage } from '@line/bot-sdk/dist/types'
 import { Charges, Sources } from 'omise'
 
 export default class PaymentServices {
-    static async createChargeFromSource(userId: string, sourceId: string, amount?: number) {
+    static async createChargeFromSource(userId: string, sourceId: string) {
         const orderId = uuidv4()
         let chargePayload: any
         try {
-            if (sourceId.startsWith('toke')) {
-                chargePayload = await OmiseServices.createChargeFromToken(sourceId, orderId, amount || 0)
-
-            } else {
-                chargePayload= await OmiseServices.createCharge(sourceId, orderId)
-            }
-            const databasePayload = await DatabaseServices.saveChargePayload(chargePayload, userId)
+            chargePayload = await OmiseServices.createCharge(sourceId, orderId)
+            const databasePayload = await DatabaseServices.saveChargePayload(
+                chargePayload,
+                userId
+            )
             return databasePayload
         } catch (e) {
             throw new Error('Cannot create order ' + e.message)
         }
     }
-    static async createPromptPay(userId: string, amount: number) {
-        // create promptpay source
-        // create charge
+    static async chargeCreditCardFromToken(
+        userId: string,
+        token: string,
+        amount: number
+    ) {
+        const orderId = uuidv4()
+        let chargePayload: any
         try {
-            const sourcePayload: Sources.ISource = await OmiseServices.createPromptPaySource(amount)
-            const chargePayload: any = await this.createChargeFromSource(userId, sourcePayload.id)
-            return chargePayload
+            chargePayload = await OmiseServices.createChargeFromToken(
+                token,
+                orderId,
+                amount || 0
+            )
+            const databasePayload = await DatabaseServices.saveChargePayload(
+                chargePayload,
+                userId
+            )
+            if (databasePayload.status === 'failed') {
+                LineService.sendMessage(userId, 'Sorry your credit card has been reject')
+                databasePayload.authorize_uri = 'https://cjtim.com/failed/' + orderId
+                return databasePayload
+            }
+            if (databasePayload.status === 'successful' && databasePayload.paid) {
+                LineService.sendMessageRaw(userId, flexRecipe)
+            }
+            return databasePayload
+        } catch (e) {
+            throw new Error(e.message)
+        }
+    }
+    static async createPromptPay(userId: string, amount: number) {
+        try {
+            const sourcePayload: Sources.ISource = await OmiseServices.createPromptPaySource(
+                amount
+            )
+            const chargePayload: any = await this.createChargeFromSource(
+                userId,
+                sourcePayload.id
+            )
+            const databasePayload = await DatabaseServices.saveChargePayload(
+                chargePayload,
+                userId
+            )
+            return databasePayload
         } catch (e) {
             throw new Error('cannot create PromptPay ' + e.message)
         }
@@ -39,12 +74,15 @@ export default class PaymentServices {
                 chargeId
             )
             if (chargePayload.paid) {
-                const databasePayload = await DatabaseServices.saveChargePayload(chargePayload)
+                const databasePayload = await DatabaseServices.saveChargePayload(
+                    chargePayload
+                )
                 const orderId: string = databasePayload.orderId
                 await LineService.sendMessageRaw(
                     databasePayload.userId,
                     flexRecipe
                 )
+                return
             }
         } catch (e) {
             throw new Error('Cannot verify userCompleteOrder ' + e.message)
