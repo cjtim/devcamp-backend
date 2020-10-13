@@ -7,7 +7,6 @@ export default class LineMiddleware {
             const accessToken = req.headers.authorization?.split(' ')[1] || ''
             if (LineService.isTokenValid(accessToken)) {
                 req.user = await LineService.getProfile(accessToken)
-                console.log(req.user)
                 next()
             }
         } catch (e) {

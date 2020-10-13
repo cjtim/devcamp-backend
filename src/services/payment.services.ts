@@ -25,13 +25,10 @@ export default class PaymentServices {
     static async createPromptPay(userId: string, amount: number) {
         // create promptpay source
         // create charge
-        // save to database
         try {
-            const orderId = uuidv4()
             const sourcePayload: Sources.ISource = await OmiseServices.createPromptPaySource(amount)
-            const chargePayload: any = await this.createCharge(sourcePayload.id, orderId)
-            const databasePayload = await DatabaseServices.saveChargePayload(chargePayload, userId)
-            return databasePayload
+            const chargePayload: any = await this.createCharge(userId, sourcePayload.id)
+            return chargePayload
         } catch (e) {
             throw new Error('cannot create PromptPay ' + e.message)
         }

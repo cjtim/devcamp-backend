@@ -33,7 +33,7 @@ export default class OmiseServices {
             })
             return sourcePayload
         } catch (error) {
-            throw new Error('cannot create Charge Promptpay ' + error.message)
+            throw new Error(' cannot create source Promptpay in Omise ' + error.message)
         }
     }
     static async search(): Promise<AxiosResponse | undefined> {
