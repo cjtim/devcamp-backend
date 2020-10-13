@@ -20,37 +20,35 @@ export default class PaymentServices {
             throw new Error('Cannot create order ' + e.message)
         }
     }
-    static async chargeCreditCardFromToken(
+    static async createChargeFromToken(
         userId: string,
         token: string,
         amount: number
     ) {
+        // 1.create charge from token
+        // 2.save to database
+        // 3.if status === 'failed' 
+        //   send fail message and update 
         const orderId = uuidv4()
         let chargePayload: any
         try {
-            chargePayload = await OmiseServices.createChargeFromToken(
-                token,
-                orderId,
-                amount || 0
-            )
-            const databasePayload = await DatabaseServices.saveChargePayload(
-                chargePayload,
-                userId
-            )
-            if (databasePayload.status === 'failed') {
+            chargePayload = await OmiseServices.createChargeFromToken(token, orderId, amount || 0)
+            if (chargePayload.status === 'failed') {
                 LineService.sendMessage(userId, 'Sorry your credit card has been reject')
-                databasePayload.authorize_uri = 'https://cjtim.com/failed/' + orderId
-                return databasePayload
             }
-            if (databasePayload.status === 'successful' && databasePayload.paid) {
+            if (chargePayload.status === 'successful' && chargePayload.paid) {
                 LineService.sendMessageRaw(userId, flexRecipe)
             }
-            return databasePayload
+            DatabaseServices.saveChargePayload(chargePayload, userId)
+            return chargePayload
         } catch (e) {
             throw new Error(e.message)
         }
     }
     static async createPromptPay(userId: string, amount: number) {
+        // 1.create source
+        // 2.create charge
+        // 3.save to database
         try {
             const sourcePayload: Sources.ISource = await OmiseServices.createPromptPaySource(
                 amount
@@ -69,6 +67,8 @@ export default class PaymentServices {
         }
     }
     static async userCompleteOrder(chargeId: string) {
+        // check is paid
+        // if paid update database
         try {
             const chargePayload: Charges.ICharge = await OmiseServices.getCharge(
                 chargeId

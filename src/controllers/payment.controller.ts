@@ -9,8 +9,7 @@ export default class PaymentController {
             let chargePayload: any
 
             if (source.startsWith('tokn')) {
-                chargePayload = await PaymentServices.chargeCreditCardFromToken(userId, source, amount)
-                PaymentServices.userCompleteOrder(chargePayload.id)
+                chargePayload = await PaymentServices.createChargeFromToken(userId, source, amount)
             } else {
                 chargePayload = await PaymentServices.createChargeFromSource(userId, source)
             }
