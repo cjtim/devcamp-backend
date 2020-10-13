@@ -16,7 +16,7 @@ export default class PaymentServices {
                 sourceId,
                 orderId
             )
-            const databasePayload = await DatabaseServices.saveChargePayload(userId, chargePayload)
+            const databasePayload = await DatabaseServices.saveChargePayload(chargePayload, userId)
             return databasePayload
         } catch (e) {
             throw new Error('Cannot create order ' + e.message)
