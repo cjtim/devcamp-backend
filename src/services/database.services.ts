@@ -38,15 +38,17 @@ export default class DatabaseServices {
 
     static async saveChargePayload(chargePayload: any, userId?: string) {
         try {
-            const data = {
-                ...chargePayload,
-                userId: userId
+            let data: object
+            if (userId) {
+                data = {
+                    ...chargePayload,
+                    userId: userId,
+                }
+            } else {
+                data = chargePayload
             }
             const databasePath = `/chargesId/${chargePayload!.id}`
-            const databasePayload: any = await this.update(
-                databasePath,
-                data
-            )
+            const databasePayload: any = await this.update(databasePath, data)
             return databasePayload
         } catch (e) {
             throw new Error('cannot save charge to database ' + e.message)
