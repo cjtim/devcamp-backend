@@ -70,17 +70,24 @@ export default class PaymentServices {
         // check is paid
         // if paid update database
         try {
-            const chargePayload: Charges.ICharge = await OmiseServices.getCharge(
+            const chargePayload: any = await OmiseServices.getCharge(
                 chargeId
             )
+            const databasePayload = await DatabaseServices.saveChargePayload(
+                chargePayload
+            )
             if (chargePayload.paid) {
-                const databasePayload = await DatabaseServices.saveChargePayload(
-                    chargePayload
-                )
                 const orderId: string = databasePayload.orderId
                 await LineService.sendMessageRaw(
                     databasePayload.userId,
                     flexRecipe
+                )
+                return
+            }
+            if (chargePayload.status === 'failed')  {
+                await LineService.sendMessage(
+                    databasePayload.userId,
+                    'Transaction failed'
                 )
                 return
             }
