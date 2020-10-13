@@ -6,16 +6,16 @@ import { FlexMessage } from '@line/bot-sdk/dist/types'
 import { Charges, Sources } from 'omise'
 
 export default class PaymentServices {
-    static async createCharge(userId: string, sourceId: string) {
-        // create Omise charge
-        // save charges payload, userId to database
-        // return charge
+    static async createChargeFromSource(userId: string, sourceId: string, amount?: number) {
+        const orderId = uuidv4()
+        let chargePayload: any
         try {
-            const orderId = uuidv4()
-            const chargePayload: any = await OmiseServices.createCharge(
-                sourceId,
-                orderId
-            )
+            if (sourceId.startsWith('toke')) {
+                chargePayload = await OmiseServices.createChargeFromToken(sourceId, orderId, amount || 0)
+
+            } else {
+                chargePayload= await OmiseServices.createCharge(sourceId, orderId)
+            }
             const databasePayload = await DatabaseServices.saveChargePayload(chargePayload, userId)
             return databasePayload
         } catch (e) {
@@ -27,7 +27,7 @@ export default class PaymentServices {
         // create charge
         try {
             const sourcePayload: Sources.ISource = await OmiseServices.createPromptPaySource(amount)
-            const chargePayload: any = await this.createCharge(userId, sourcePayload.id)
+            const chargePayload: any = await this.createChargeFromSource(userId, sourcePayload.id)
             return chargePayload
         } catch (e) {
             throw new Error('cannot create PromptPay ' + e.message)

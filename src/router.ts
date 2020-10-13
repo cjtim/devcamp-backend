@@ -24,7 +24,7 @@ router.post(
 router.post(
     '/payment/charges/create',
     LineMiddleware.liffVerify,
-    PaymentController.createPayment
+    PaymentController.createWithOmiseForm
 )
 
 router.get('/uuid', (req, res) => res.json(uuidv4()))

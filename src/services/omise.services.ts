@@ -101,5 +101,19 @@ export default class OmiseServices {
             throw new Error('cannot create Charge from source ' + sourceId + error.message)
         }
     }
-    static async chargeCreditCard(token: string, amount: number) {}
+    static async createChargeFromToken(cardToken: string, orderId: string, amount: number) {
+        try {
+            const payload: Charges.IRequest = {
+                amount: amount,
+                currency: 'THB',
+                return_uri: RETURN_URI + '/' + orderId,
+                card: cardToken,
+            }
+            const response: AxiosResponse = await chargeInstance.post('/charges/', payload)
+            const chargePayload = response.data
+            return chargePayload
+        } catch (error) {
+            throw new Error('cannot create Charge from cardToken ' + cardToken + error.message)
+        }
+    }
 }

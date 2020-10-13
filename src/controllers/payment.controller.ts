@@ -4,12 +4,17 @@ import OmiseServices from '../services/omise.services'
 import PaymentServices from '../services/payment.services'
 
 export default class PaymentController {
-    static async createPayment(req: any, res: Response) {
-        const { source } = req.body
-        const userId = req.user.lineUserId
-        const chargePayload = await PaymentServices.createCharge(userId, source)
-        const paymentUrl = chargePayload.authorize_uri
-        res.json(paymentUrl)
+    static async createWithOmiseForm(req: any, res: Response) {
+        try {
+            const { source, amount }: { source: string, amount: number} = req.body
+            const userId = req.user.lineUserId
+    
+            const chargePayload = await PaymentServices.createChargeFromSource(userId, source, amount)
+            const paymentUrl = chargePayload.authorize_uri
+            res.json(paymentUrl)
+        } catch (e) {
+            throw new Error('cannot create charge from omise form ' + e.message)
+        }
     }
     static async webhookChargeComplete(req: any, res: Response) {
         try {
