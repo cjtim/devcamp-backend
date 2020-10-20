@@ -20,6 +20,7 @@ export default class PaymentServices {
             throw new Error('Cannot create order ' + e.message)
         }
     }
+    // if Credit Card create with Omise form
     static async createChargeFromToken(
         userId: string,
         token: string,

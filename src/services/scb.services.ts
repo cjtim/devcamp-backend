@@ -67,7 +67,7 @@ export class SCBServices {
                     authorization: `Bearer ${accessToken}`,
                 },
             })
-            console.log(scbEndPoint.data.data)
+            return scbEndPoint.data.data.deeplinkUrl
         } catch (error) {
             console.log(error.message)
         }

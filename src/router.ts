@@ -6,6 +6,7 @@ import * as line from '@line/bot-sdk'
 import CONST from './const'
 import LineMiddleware from './middleware/line.middleware'
 import PaymentController from './controllers/payment.controller'
+import { SCBServices } from './services/scb.services'
 
 const config = {
     channelAccessToken: CONST.LINE_CHANNEL_TOKEN,
@@ -26,7 +27,10 @@ router.post(
     LineMiddleware.liffVerify,
     PaymentController.createWithOmiseForm
 )
-
+router.post('/payment/scb', async(req, res) => {
+    const {amount} = req.body
+    res.status(200).send(await SCBServices.createLink(amount))
+})
 router.get('/uuid', (req, res) => res.json(uuidv4()))
 router.post('/omise/webhook', OmiseController.webhookHandle)
 router.post('/line/webhook', line.middleware(config), (req, res) =>
