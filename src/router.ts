@@ -27,7 +27,7 @@ router.post(
     LineMiddleware.liffVerify,
     PaymentController.createWithOmiseForm
 )
-router.post('/payment/scb', async(req, res) => {
+router.post('/payment/scb', LineMiddleware.liffVerify, async(req, res) => {
     const {amount} = req.body
     res.status(200).send(await SCBServices.createLink(amount))
 })
