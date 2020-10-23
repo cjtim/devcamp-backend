@@ -54,4 +54,13 @@ export default class DatabaseServices {
             throw new Error('cannot save charge to database ' + e.message)
         }
     }
+    static async getChargesByOrderId(orderId: string) {
+        try {
+            let data: any
+            data = await (await database.ref('/chargesId').orderByChild('orderId').equalTo(orderId).once('value')).exportVal()
+            return data
+        } catch (e) {
+            throw new Error('')
+        }
+    }
 }

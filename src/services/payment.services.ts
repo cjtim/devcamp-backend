@@ -11,7 +11,7 @@ export default class PaymentServices {
         let chargePayload: any
         try {
             chargePayload = await OmiseServices.createCharge(sourceId, orderId)
-            chargePayload = {...chargePayload, orderId: orderId}
+            chargePayload = { ...chargePayload, orderId: orderId }
             const databasePayload = await DatabaseServices.saveChargePayload(
                 chargePayload,
                 userId
@@ -29,15 +29,22 @@ export default class PaymentServices {
     ) {
         // 1.create charge from token
         // 2.save to database
-        // 3.if status === 'failed' 
-        //   send fail message and update 
+        // 3.if status === 'failed'
+        //   send fail message and update
         const orderId = uuidv4()
         let chargePayload: any
         try {
-            chargePayload = await OmiseServices.createChargeFromToken(token, orderId, amount || 0)
-            chargePayload = {...chargePayload, orderId: orderId}
+            chargePayload = await OmiseServices.createChargeFromToken(
+                token,
+                orderId,
+                amount || 0
+            )
+            chargePayload = { ...chargePayload, orderId: orderId }
             if (chargePayload.status === 'failed') {
-                LineService.sendMessage(userId, 'Sorry your credit card has been reject')
+                LineService.sendMessage(
+                    userId,
+                    'Sorry your credit card has been reject'
+                )
             }
             if (chargePayload.status === 'successful' && chargePayload.paid) {
                 LineService.sendMessageRaw(userId, flexRecipe)
@@ -73,9 +80,7 @@ export default class PaymentServices {
         // check is paid
         // if paid update database
         try {
-            const chargePayload: any = await OmiseServices.getCharge(
-                chargeId
-            )
+            const chargePayload: any = await OmiseServices.getCharge(chargeId)
             const databasePayload = await DatabaseServices.saveChargePayload(
                 chargePayload
             )
@@ -87,7 +92,7 @@ export default class PaymentServices {
                 )
                 return
             }
-            if (chargePayload.status === 'failed')  {
+            if (chargePayload.status === 'failed') {
                 await LineService.sendMessage(
                     databasePayload.userId,
                     'Transaction failed'
@@ -100,15 +105,16 @@ export default class PaymentServices {
     }
     static async getStatus(transactionId: string) {
         try {
-            let databasePayload: any = await DatabaseServices.get('/chargesId')
-            const oldCharge = databasePayload.filter( (charge: any) => charge.orderId === transactionId)
+            let databasePayload: any = await DatabaseServices.getChargesByOrderId(transactionId)
+            databasePayload = databasePayload[Object.keys(databasePayload)[0]]
             const newCharge = await OmiseServices.getCharge(
-                oldCharge.id
+                databasePayload.id
             )
-            databasePayload = await DatabaseServices.saveChargePayload(newCharge, oldCharge.userId)
+            databasePayload = await DatabaseServices.saveChargePayload(newCharge, databasePayload.userId)
             return newCharge.paid
         } catch (e) {
-            throw new Error("cannot transaction id not found")
+            console.log(e)
+            throw new Error('cannot transaction id not found')
         }
     }
 }
