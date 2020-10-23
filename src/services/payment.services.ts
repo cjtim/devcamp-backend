@@ -11,6 +11,7 @@ export default class PaymentServices {
         let chargePayload: any
         try {
             chargePayload = await OmiseServices.createCharge(sourceId, orderId)
+            chargePayload = {...chargePayload, orderId: orderId}
             const databasePayload = await DatabaseServices.saveChargePayload(
                 chargePayload,
                 userId
@@ -34,6 +35,7 @@ export default class PaymentServices {
         let chargePayload: any
         try {
             chargePayload = await OmiseServices.createChargeFromToken(token, orderId, amount || 0)
+            chargePayload = {...chargePayload, orderId: orderId}
             if (chargePayload.status === 'failed') {
                 LineService.sendMessage(userId, 'Sorry your credit card has been reject')
             }
@@ -94,6 +96,19 @@ export default class PaymentServices {
             }
         } catch (e) {
             throw new Error('Cannot verify userCompleteOrder ' + e.message)
+        }
+    }
+    static async getStatus(transactionId: string) {
+        try {
+            let databasePayload: any = await DatabaseServices.get('/chargesId')
+            const oldCharge = databasePayload.filter( (charge: any) => charge.orderId === transactionId)
+            const newCharge = await OmiseServices.getCharge(
+                oldCharge.id
+            )
+            databasePayload = await DatabaseServices.saveChargePayload(newCharge, oldCharge.userId)
+            return newCharge.paid
+        } catch (e) {
+            throw new Error("cannot transaction id not found")
         }
     }
 }

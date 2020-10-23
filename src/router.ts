@@ -7,6 +7,7 @@ import CONST from './const'
 import LineMiddleware from './middleware/line.middleware'
 import PaymentController from './controllers/payment.controller'
 import { SCBServices } from './services/scb.services'
+import PaymentServices from './services/payment.services'
 
 const config = {
     channelAccessToken: CONST.LINE_CHANNEL_TOKEN,
@@ -36,6 +37,13 @@ router.post('/omise/webhook', OmiseController.webhookHandle)
 router.post('/line/webhook', line.middleware(config), (req, res) =>
     res.status(200)
 )
+router.post('/payment/status', LineMiddleware.liffVerify, async(req, res) => {
+    const { transactionId } = req.body
+    res.status(200).send({
+        paid: await PaymentServices.getStatus(transactionId)
+    })
+    
+})
 
 function hi(req: Request, res: Response) {
     if (JSON.stringify(req.body) === '{}') res.send('No req.body :(')
