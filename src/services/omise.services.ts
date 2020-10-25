@@ -4,7 +4,6 @@ import axios, { AxiosResponse } from 'axios'
 import * as omise from 'omise'
 import CONST from './../const'
 import { Charges, Sources } from 'omise/types/index'
-import e from 'express'
 
 const Omise = omise.default({
     publicKey: CONST.OMISE_PUB_KEY,
@@ -22,7 +21,7 @@ const chargeInstance = axios.create({
     headers: HEADERS,
 })
 const RETURN_URI = CONST.PAYMENT_RETURN_URL
-export default class OmiseServices {
+export class OmiseServices {
     static async createPromptPaySource(amount: number): Promise<Sources.ISource> {
         try {
             amount = amount
@@ -34,24 +33,6 @@ export default class OmiseServices {
             return sourcePayload
         } catch (error) {
             throw new Error(' cannot create source Promptpay in Omise ' + error.message)
-        }
-    }
-    static async search(): Promise<AxiosResponse | undefined> {
-        try {
-            const payload = await chargeInstance.get(
-                '/search?filters[status]=successful',
-                {
-                    params: {
-                        scope: 'charge',
-                        query: {
-                            description: 'restaurant1',
-                        },
-                    },
-                }
-            )
-            return payload.data
-        } catch (error) {
-            console.error(error)
         }
     }
     static async isPaid(chargesId: string): Promise<boolean> {

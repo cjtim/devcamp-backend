@@ -9,7 +9,7 @@ const config = {
 }
 
 const client = new line.Client(config)
-export default class LineService {
+export class LineServices {
     static async isTokenValid(accessToken: string) {
         try {
             const response = await axios.get(

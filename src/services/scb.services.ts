@@ -1,4 +1,5 @@
 import axios from 'axios'
+import e from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import CONST from './../const'
 
@@ -30,11 +31,9 @@ export class SCBServices {
     static async createLink(amount: number) {
         try {
             const requestUID = uuidv4()
-            console.log('requestUID ' + requestUID)
             const orderId = requestUID.slice(0, 8)
             const callbackUrl = CONST.PAYMENT_RETURN_URL + '/' + orderId
             const accessToken = await this.getToken(requestUID)
-            console.log('AccessToken ' + accessToken)
 
             const orderPayload = {
                 transactionType: 'PURCHASE',
@@ -67,7 +66,12 @@ export class SCBServices {
                     authorization: `Bearer ${accessToken}`,
                 },
             })
-            return scbEndPoint.data.data.deeplinkUrl
+            const response = {
+                ...scbEndPoint.data,
+                orderId: orderId,
+                requestUId: requestUID
+            }
+            return response
         } catch (error) {
             console.log(error.message)
         }
@@ -86,12 +90,11 @@ export class SCBServices {
                     },
                 }
             )
-            console.log(payload.data.data)
             if (payload.data.data.statusCode === 1) {
                 return true
             }
-        } catch (error) {
-            console.error(error.message)
+        } catch (e) {
+            throw new Error('cannot verify isPaid ' + e.message)
         }
         return false
     }

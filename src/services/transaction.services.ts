@@ -1,123 +1,154 @@
-import DatabaseServices from './database.services'
-import OmiseServices from './omise.services'
-import { v4 as uuidv4 } from 'uuid'
-import LineService from './line.services'
 import { FlexMessage } from '@line/bot-sdk/dist/types'
-import { Charges, Sources } from 'omise'
+import { Sources } from 'omise'
+import { PAYMENT_METHOD } from '../enum'
+import { Orders } from '../models/order'
+import { Transactions } from '../models/transaction'
+import { LineServices } from './line.services'
+import { OmiseServices } from './omise.services'
 
-export default class PaymentServices {
-    static async createChargeFromSource(userId: string, sourceId: string) {
-        const orderId = uuidv4()
-        let chargePayload: any
+export class TransactionServices {
+    static async create(
+        method: PAYMENT_METHOD,
+        payAmount: number,
+        orderId: string,
+        lineUid: string
+    ) {
         try {
-            chargePayload = await OmiseServices.createCharge(sourceId, orderId)
-            chargePayload = { ...chargePayload, orderId: orderId }
-            const databasePayload = await DatabaseServices.saveChargePayload(
-                chargePayload,
-                userId
-            )
-            return databasePayload
+            const response = await Transactions.create({
+                method: method,
+                amount: payAmount,
+                orderId: orderId,
+                lineUid: lineUid,
+            })
+            return response
         } catch (e) {
-            throw new Error('Cannot create order ' + e.message)
+            throw new Error('cannot create transaction ' + e.message)
         }
     }
-    // if Credit Card create with Omise form
-    static async createChargeFromToken(
-        userId: string,
-        token: string,
-        amount: number
+    static async createByOmise(
+        method: PAYMENT_METHOD,
+        payAmount: number,
+        orderId: string,
+        lineUid: string,
+        sourceId: string
     ) {
-        // 1.create charge from token
-        // 2.save to database
-        // 3.if status === 'failed'
-        //   send fail message and update
-        const orderId = uuidv4()
-        let chargePayload: any
         try {
-            chargePayload = await OmiseServices.createChargeFromToken(
-                token,
-                orderId,
-                amount || 0
-            )
-            chargePayload = { ...chargePayload, orderId: orderId }
-            if (chargePayload.status === 'failed') {
-                LineService.sendMessage(
-                    userId,
-                    'Sorry your credit card has been reject'
+            let chargePayload: any
+            if (sourceId.startsWith('tokn')) {
+                chargePayload = await OmiseServices.createChargeFromToken(
+                    sourceId,
+                    orderId,
+                    payAmount
+                )
+            } else {
+                chargePayload = await OmiseServices.createCharge(
+                    sourceId,
+                    orderId
                 )
             }
-            if (chargePayload.status === 'successful' && chargePayload.paid) {
-                LineService.sendMessageRaw(userId, flexRecipe)
+            if (chargePayload.status === 'failed') {
+                LineServices.sendMessage(
+                    lineUid,
+                    'Sorry your credit card has been reject'
+                )
+            } else if (
+                chargePayload.status === 'successful' &&
+                chargePayload.paid
+            ) {
+                LineServices.sendMessageRaw(lineUid, flexRecipe)
             }
-            DatabaseServices.saveChargePayload(chargePayload, userId)
-            return chargePayload
+            const response = await Transactions.create({
+                method: method,
+                amount: payAmount,
+                orderId: orderId,
+                chargeId: chargePayload.id,
+                lineUid: lineUid,
+            })
+            return { ...response, ...chargePayload }
         } catch (e) {
-            throw new Error(e.message)
+            throw new Error('cannot create transaction ' + e.message)
         }
     }
-    static async createPromptPay(userId: string, amount: number) {
-        // 1.create source
-        // 2.create charge
-        // 3.save to database
+    static async createByOmisePromptPay(
+        method: PAYMENT_METHOD,
+        payAmount: number,
+        orderId: string,
+        lineUid: string
+    ) {
         try {
             const sourcePayload: Sources.ISource = await OmiseServices.createPromptPaySource(
-                amount
+                payAmount
             )
-            const chargePayload: any = await this.createChargeFromSource(
-                userId,
-                sourcePayload.id
+            const chargePayload: any = await OmiseServices.createCharge(
+                sourcePayload.id,
+                orderId
             )
-            const databasePayload = await DatabaseServices.saveChargePayload(
-                chargePayload,
-                userId
-            )
-            return databasePayload
+            const response = await Transactions.create({
+                method: method,
+                amount: payAmount,
+                orderId: orderId,
+                chargeId: chargePayload.id,
+                lineUid: lineUid,
+            })
+            const paymentUrl: string =
+                chargePayload.source.scannable_code.image.download_uri
+            return { url: paymentUrl, ...response }
         } catch (e) {
-            throw new Error('cannot create PromptPay ' + e.message)
+            throw new Error('cannot create omise promptPay')
         }
     }
-    static async userCompleteOrder(chargeId: string) {
-        // check is paid
-        // if paid update database
+    static async omiseChargeComplete(chargeId: string) {
         try {
+            // update transaction database
             const chargePayload: any = await OmiseServices.getCharge(chargeId)
-            const databasePayload = await DatabaseServices.saveChargePayload(
-                chargePayload
-            )
+            const transactionPayload = await Transactions.findOne({
+                where: {
+                    chargeId: chargeId,
+                },
+            })
+            await transactionPayload?.update({ paid: chargePayload.paid })
+            // notify user
+            const orderPayload = await Orders.findOne({
+                where: {
+                    transactionId: transactionPayload?.getDataValue('id'),
+                },
+            })
             if (chargePayload.paid) {
-                const orderId: string = databasePayload.orderId
-                await LineService.sendMessageRaw(
-                    databasePayload.userId,
+                await LineServices.sendMessageRaw(
+                    orderPayload?.getDataValue('lineUid'),
                     flexRecipe
                 )
                 return
-            }
-            if (chargePayload.status === 'failed') {
-                await LineService.sendMessage(
-                    databasePayload.userId,
+            } else if (chargePayload.status === 'failed') {
+                await LineServices.sendMessage(
+                    orderPayload?.getDataValue('lineUid'),
                     'Transaction failed'
                 )
                 return
             }
         } catch (e) {
-            throw new Error('Cannot verify userCompleteOrder ' + e.message)
+            throw new Error('Cannot complete omiseChargeComplete ' + e.message)
         }
     }
-    static async getStatus(transactionId: string) {
+    static async getTransaction(transactionId: string) {
         try {
-            let databasePayload: any = await DatabaseServices.getChargesByOrderId(transactionId)
-            databasePayload = databasePayload[Object.keys(databasePayload)[0]]
-            const newCharge = await OmiseServices.getCharge(
-                databasePayload.id
-            )
-            databasePayload = await DatabaseServices.saveChargePayload(newCharge, databasePayload.userId)
-            return newCharge.paid
+            let databasePayload = await Transactions.findOne({
+                where: {
+                    transactionId: transactionId,
+                },
+            })
+            if (databasePayload?.getDataValue('method') === 'OMISE') {
+                const newCharge = await OmiseServices.getCharge(databasePayload.getDataValue('chargeId'))
+                databasePayload.setDataValue('paid', newCharge.paid)
+            }
+            databasePayload?.save()
+            return databasePayload?.get()
         } catch (e) {
-            console.log(e)
             throw new Error('cannot transaction id not found')
         }
     }
 }
+
 const flexRecipe: FlexMessage = {
     type: 'flex',
     altText: 'Transaction Complete',

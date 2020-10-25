@@ -4,6 +4,9 @@ import express from 'express'
 import router from './router'
 import cors from 'cors'
 import CONST from './const'
+import { sequelize } from './postgres'
+import { errorHandle } from './utils/errorHandle'
+
 const app = express()
 
 app.use(express.json())
@@ -17,6 +20,9 @@ const corsOption = {
 }
 app.use(cors(corsOption))
 app.use(router)
+app.use(errorHandle)
+
+sequelize
 
 app.listen(process.env.PORT, () => {
     console.log(`it's works!,checkit out! http://localhost:${process.env.PORT}`)

@@ -1,12 +1,13 @@
-import { Request, Response } from 'express'
-import PaymentController from './payment.controller'
+import { NextFunction, Request, Response } from 'express'
+import { TransactionServices } from '../services'
 
-export default class OmiseController {
-    static async webhookHandle(req: Request, res: Response) {
+export class OmiseController {
+    static async webhookHandle(req: Request, res: Response, next: NextFunction) {
         const { key } = req.body
         console.log(key)
         if (key === 'charge.complete') {
-            PaymentController.webhookChargeComplete(req, res)
+            const chargePayload = req.body
+            TransactionServices.omiseChargeComplete(chargePayload.id)
         }
         res.status(200)
     }

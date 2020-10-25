@@ -1,53 +1,35 @@
-import { Request, Response, Router } from 'express'
+import { Router } from 'express'
 const router = Router({ strict: true, caseSensitive: true })
 import { v4 as uuidv4 } from 'uuid'
-import OmiseController from './controllers/omise.controller'
-import * as line from '@line/bot-sdk'
-import CONST from './const'
+import {
+    OmiseController,
+    MenuController,
+    OrderController,
+    RestaurantController,
+    SCBController,
+    TransactionController,
+} from './controllers'
 import LineMiddleware from './middleware/line.middleware'
-import PaymentController from './controllers/payment.controller'
-import { SCBServices } from './services/scb.services'
-import PaymentServices from './services/payment.services'
 
-const config = {
-    channelAccessToken: CONST.LINE_CHANNEL_TOKEN,
-    channelSecret: CONST.LINE_CHANNEL_SECRET,
-}
-router.get('/', hi)
-router.post('/', hi)
+router.get('/', (req, res) => res.send('Backend working ♥'))
+
+router.post('/restaurant/create', RestaurantController.create)
+router.post('/menu/create', MenuController.create)
+router.post('/order/create', OrderController.create)
 
 router.post(
-    '/payment/promptpay/create',
+    '/transaction/create',
     LineMiddleware.liffVerify,
-    PaymentController.createPromptPay
+    TransactionController.create
 )
-// router.get('/payment/ispaid/:chargesId', PaymentController.isPaid)
-// router.get('/payment/refund/:chargesId', PaymentController.refund) // This is dangerous, don't use on production
-router.post(
-    '/payment/charges/create',
-    LineMiddleware.liffVerify,
-    PaymentController.createWithOmiseForm
-)
-router.post('/payment/scb', LineMiddleware.liffVerify, async(req, res) => {
-    const {amount} = req.body
-    res.status(200).send(await SCBServices.createLink(amount))
-})
+
 router.get('/uuid', (req, res) => res.json(uuidv4()))
+
+// Webhook
+router.post('/scb/webhook', SCBController.webhookHandle)
 router.post('/omise/webhook', OmiseController.webhookHandle)
-router.post('/line/webhook', line.middleware(config), (req, res) =>
+router.post('/line/webhook', LineMiddleware.webhookVerify, (req, res) =>
     res.status(200)
 )
-router.post('/payment/status', LineMiddleware.liffVerify, async(req, res) => {
-    const { transactionId } = req.body
-    res.status(200).send({
-        paid: await PaymentServices.getStatus(transactionId)
-    })
-    
-})
-
-function hi(req: Request, res: Response) {
-    if (JSON.stringify(req.body) === '{}') res.send('No req.body :(')
-    else res.status(200).send(req.body)
-}
 
 export default router
