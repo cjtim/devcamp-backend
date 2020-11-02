@@ -11,125 +11,59 @@ export class TransactionServices {
         method: PAYMENT_METHOD,
         payAmount: number,
         orderId: string,
-        lineUid: string
+        lineUid: string,
+        sourceId: string
     ) {
         try {
-            const response = await Transactions.create({
-                method: method,
-                amount: payAmount,
-                orderId: orderId,
-                lineUid: lineUid,
-            })
+            let response: any
+            if (method === PAYMENT_METHOD.SCB_EASY) {
+                response = await Transactions.create({
+                    method: method,
+                    amount: payAmount,
+                    orderId: orderId,
+                    lineUid: lineUid,
+                })
+            }
+            else if (method === PAYMENT_METHOD.OMISE) {
+                let chargePayload: any
+                if (sourceId.startsWith('tokn')) {
+                    chargePayload = await OmiseServices.createChargeFromToken(
+                        sourceId,
+                        orderId,
+                        payAmount
+                    )
+                } else {
+                    chargePayload = await OmiseServices.createCharge(
+                        sourceId,
+                        orderId
+                    )
+                }
+                const response = await Transactions.create({
+                    method: method,
+                    amount: payAmount,
+                    orderId: orderId,
+                    chargeId: chargePayload.id,
+                    lineUid: lineUid,
+                })
+                if (chargePayload.status === 'failed') {
+                    LineServices.sendMessage(
+                        lineUid,
+                        'Sorry your credit card has been reject'
+                    )
+                } else if (
+                    chargePayload.status === 'successful' &&
+                    chargePayload.paid
+                ) {
+                    LineServices.sendMessageRaw(lineUid, flexRecipe)
+                }
+                return { ...response, ...chargePayload }
+            }
             return response
         } catch (e) {
             throw new Error('cannot create transaction ' + e.message)
         }
     }
-    static async createByOmise(
-        method: PAYMENT_METHOD,
-        payAmount: number,
-        orderId: string,
-        lineUid: string,
-        sourceId: string
-    ) {
-        try {
-            let chargePayload: any
-            if (sourceId.startsWith('tokn')) {
-                chargePayload = await OmiseServices.createChargeFromToken(
-                    sourceId,
-                    orderId,
-                    payAmount
-                )
-            } else {
-                chargePayload = await OmiseServices.createCharge(
-                    sourceId,
-                    orderId
-                )
-            }
-            if (chargePayload.status === 'failed') {
-                LineServices.sendMessage(
-                    lineUid,
-                    'Sorry your credit card has been reject'
-                )
-            } else if (
-                chargePayload.status === 'successful' &&
-                chargePayload.paid
-            ) {
-                LineServices.sendMessageRaw(lineUid, flexRecipe)
-            }
-            const response = await Transactions.create({
-                method: method,
-                amount: payAmount,
-                orderId: orderId,
-                chargeId: chargePayload.id,
-                lineUid: lineUid,
-            })
-            return { ...response, ...chargePayload }
-        } catch (e) {
-            throw new Error('cannot create transaction ' + e.message)
-        }
-    }
-    static async createByOmisePromptPay(
-        method: PAYMENT_METHOD,
-        payAmount: number,
-        orderId: string,
-        lineUid: string
-    ) {
-        try {
-            const sourcePayload: Sources.ISource = await OmiseServices.createPromptPaySource(
-                payAmount
-            )
-            const chargePayload: any = await OmiseServices.createCharge(
-                sourcePayload.id,
-                orderId
-            )
-            const response = await Transactions.create({
-                method: method,
-                amount: payAmount,
-                orderId: orderId,
-                chargeId: chargePayload.id,
-                lineUid: lineUid,
-            })
-            const paymentUrl: string =
-                chargePayload.source.scannable_code.image.download_uri
-            return { url: paymentUrl, ...response }
-        } catch (e) {
-            throw new Error('cannot create omise promptPay')
-        }
-    }
-    static async omiseChargeComplete(chargeId: string) {
-        try {
-            // update transaction database
-            const chargePayload: any = await OmiseServices.getCharge(chargeId)
-            const transactionPayload = await Transactions.findOne({
-                where: {
-                    chargeId: chargeId,
-                },
-            })
-            await transactionPayload?.update({ paid: chargePayload.paid })
-            // notify user
-            const orderPayload = await Orders.findOne({
-                where: {
-                    transactionId: transactionPayload?.getDataValue('id'),
-                },
-            })
-            if (chargePayload.paid) {
-                await LineServices.sendMessageRaw(
-                    orderPayload?.getDataValue('lineUid'),
-                    flexRecipe
-                )
-                return
-            } else if (chargePayload.status === 'failed') {
-                await LineServices.sendMessage(
-                    orderPayload?.getDataValue('lineUid'),
-                    'Transaction failed'
-                )
-                return
-            }
-        } catch (e) {
-            throw new Error('Cannot complete omiseChargeComplete ' + e.message)
-        }
-    }
+   
     static async getTransaction(transactionId: string) {
         try {
             let databasePayload = await Transactions.findOne({

@@ -36,7 +36,6 @@ export const Restaurants = sequelize.define(
         lineUid: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true
         }
     },
     {

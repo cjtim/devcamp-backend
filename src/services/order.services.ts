@@ -16,13 +16,14 @@ export class OrderServices {
                     exclude: ['createdAt', 'updatedAt'],
                 },
             })
+            if (!data) return {status: "not found menu"}
             for (let i = 0; i < data.length; i++) {
                 const item = data[i].get()
                 response.push({ ...item, payAmount: item.price * unitList[i] })
             }
             const orderPayload = await Orders.create({
                 lineUid: lineUid,
-                selectMenu: response,
+                selectedMenu: response,
                 restaurantId: restaurantId
             })
             return orderPayload

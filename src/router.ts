@@ -10,26 +10,39 @@ import {
     TransactionController,
 } from './controllers'
 import LineMiddleware from './middleware/line.middleware'
-
-router.get('/', (req, res) => res.send('Backend working ♥'))
-
+// Restaurant
 router.post('/restaurant/create', RestaurantController.create)
+router.post('/restaurant/get', RestaurantController.get)
+router.post('/restaurant/list', LineMiddleware.liffVerify, RestaurantController.list)
+// Menu
 router.post('/menu/create', MenuController.create)
-router.post('/order/create', OrderController.create)
-
+router.post('/menu/get', MenuController.get)
+router.post('/menu/list', MenuController.list)
+// Order
+router.post('/order/create', LineMiddleware.liffVerify, OrderController.create)
+router.post('/order/get', OrderController.get)
+router.post('/order/list', OrderController.list)
+// Transaction
 router.post(
     '/transaction/create',
     LineMiddleware.liffVerify,
     TransactionController.create
 )
+router.post('/transaction/get')
+router.post('/transaction/list')
 
-router.get('/uuid', (req, res) => res.json(uuidv4()))
+
+
+
 
 // Webhook
 router.post('/scb/webhook', SCBController.webhookHandle)
 router.post('/omise/webhook', OmiseController.webhookHandle)
 router.post('/line/webhook', LineMiddleware.webhookVerify, (req, res) =>
-    res.status(200)
+res.status(200)
 )
+
+router.get('/uuid', (req, res) => res.json(uuidv4()))
+
 
 export default router

@@ -19,7 +19,6 @@ export class LineServices {
                 return true
             }
         } catch (error) {
-            console.error(error.message)
             throw new Error('error with verify line token ' + error.message)
         }
         return false

@@ -24,6 +24,8 @@ app.use(errorHandle)
 
 sequelize
 
+app.get('/', (req, res) => res.send('Backend working ♥'))
+
 app.listen(process.env.PORT, () => {
     console.log(`it's works!,checkit out! http://localhost:${process.env.PORT}`)
 })
