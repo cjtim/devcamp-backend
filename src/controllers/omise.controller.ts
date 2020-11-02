@@ -7,7 +7,7 @@ export class OmiseController {
         console.log(key)
         if (key === 'charge.complete') {
             const chargePayload = req.body
-            TransactionServices.omiseChargeComplete(chargePayload.id)
+            // TransactionServices.omiseChargeComplete(chargePayload.id)
         }
         res.status(200)
     }
