@@ -64,7 +64,7 @@ export class SCBServices {
                     authorization: `Bearer ${accessToken}`,
                 },
             })
-            const deeplinkUrl = scbEndPoint.data.data.deeplinkUrl + "?callback_url=" + CONST.PAYMENT_RETURN_URL + '/' + orderId,
+            const deeplinkUrl = scbEndPoint.data.data.deeplinkUrl + "?callback_url=" + CONST.PAYMENT_RETURN_URL + '/' + orderId
             const response = {
                 transactionId: scbEndPoint.data.data.transactionId,
                 deeplinkUrl:  deeplinkUrl,
