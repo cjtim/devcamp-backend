@@ -30,6 +30,7 @@ router.post(
 )
 router.post('/transaction/get')
 router.post('/transaction/list')
+router.post('/transaction/ispaid', LineMiddleware.liffVerify ,TransactionController.isPaid)
 
 
 

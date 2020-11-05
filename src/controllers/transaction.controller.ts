@@ -7,16 +7,15 @@ export class TransactionController {
     static async create(req: Request, res: Response, next: NextFunction) {
         try {
             const { payAmount, orderId } = req.body
-            let response: any
-            response = await SCBServices.createLink(payAmount)
+            const response = await SCBServices.createLink(payAmount)
             await Transactions.create({
-                id: response.data.transactionId,
+                id: response!.transactionId,
                 method: PAYMENT_METHOD.SCB_EASY,
                 amount: payAmount,
                 lineUid: req.user.userId,
                 orderId: orderId,
             })
-            res.json({ deeplinkUrl: response.data.deeplinkUrl })
+            res.json({ deeplinkUrl: response!.deeplinkUrl })
         } catch (e) {
             console.log(e)
             next(e)
@@ -26,6 +25,15 @@ export class TransactionController {
         try {
             const { transactionId } = req.body
             res.json(await TransactionServices.getTransaction(transactionId))
+        } catch (e) {
+            next(e)
+        }
+    }
+    static async isPaid(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { transactionId } = req.body
+            const isPaid = await TransactionServices.isPaid(transactionId)
+            res.json({ paid: isPaid })
         } catch (e) {
             next(e)
         }

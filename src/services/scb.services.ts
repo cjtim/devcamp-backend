@@ -1,5 +1,4 @@
 import axios from 'axios'
-import e from 'express'
 import { v4 as uuidv4 } from 'uuid'
 import CONST from './../const'
 
@@ -32,7 +31,6 @@ export class SCBServices {
         try {
             const requestUID = uuidv4()
             const orderId = requestUID.slice(0, 8)
-            const callbackUrl = CONST.PAYMENT_RETURN_URL + '/' + orderId
             const accessToken = await this.getToken(requestUID)
 
             const orderPayload = {
@@ -53,7 +51,7 @@ export class SCBServices {
                     paymentAmount: amount,
                 },
                 merchantMetaData: {
-                    callbackUrl: callbackUrl,
+                    // callbackUrl: callbackUrl,
                     merchantInfo: {
                         name: 'TestMerchant1601835607',
                     },
@@ -66,8 +64,10 @@ export class SCBServices {
                     authorization: `Bearer ${accessToken}`,
                 },
             })
+            const deeplinkUrl = scbEndPoint.data.data.deeplinkUrl + "?callback_url=" + CONST.PAYMENT_RETURN_URL + '/' + orderId,
             const response = {
-                ...scbEndPoint.data,
+                transactionId: scbEndPoint.data.data.transactionId,
+                deeplinkUrl:  deeplinkUrl,
                 orderId: orderId,
                 requestUId: requestUID
             }
@@ -76,7 +76,7 @@ export class SCBServices {
             console.log(error.message)
         }
     }
-    static async isPaid(tranactionId: string): Promise<boolean> {
+    static async get(tranactionId: string) {
         try {
             const requestUID = uuidv4()
             const accessToken = await this.getToken(requestUID)
@@ -90,7 +90,15 @@ export class SCBServices {
                     },
                 }
             )
-            if (payload.data.data.statusCode === 1) {
+            return payload.data
+        } catch (e)  {
+            throw new Error('Cannot get transaction id ' + tranactionId)
+        }
+    }
+    static async isPaid(tranactionId: string): Promise<boolean> {
+        try {
+            const transaction = await this.get(tranactionId)
+            if (transaction.data.statusCode === 1) {
                 return true
             }
         } catch (e) {

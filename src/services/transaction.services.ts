@@ -74,6 +74,13 @@ export class TransactionServices {
             throw new Error('cannot transaction id not found')
         }
     }
+    static async isPaid(transactionId: string): Promise<boolean> {
+        try{
+            return SCBServices.isPaid(transactionId)
+        } catch (e) {
+            throw new Error('cannot get transaction id ' + transactionId)
+        }
+    }
 }
 
 const flexRecipe: FlexMessage = {
