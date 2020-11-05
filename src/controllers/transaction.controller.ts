@@ -1,20 +1,24 @@
 import { NextFunction, Request, Response } from 'express'
 import { PAYMENT_METHOD } from '../enum'
-import { TransactionServices } from '../services'
+import { Transactions } from '../models/transaction'
+import { SCBServices, TransactionServices } from '../services'
 
 export class TransactionController {
     static async create(req: Request, res: Response, next: NextFunction) {
         try {
-            const { method, sourceId, payAmount, orderId } = req.body
+            const { payAmount, orderId } = req.body
             let response: any
-            response = await TransactionServices.create(
-                method === 'OMISE' ? PAYMENT_METHOD.OMISE : PAYMENT_METHOD.SCB_EASY,
-                payAmount,
-                orderId,
-                req.user.userId,
-                sourceId
-            )
+            response = await SCBServices.createLink(payAmount)
+            await Transactions.create({
+                id: response.data.transactionId,
+                method: PAYMENT_METHOD.SCB_EASY,
+                amount: payAmount,
+                lineUid: req.user.userId,
+                orderId: orderId,
+            })
+            res.json({ deeplinkUrl: response.data.deeplinkUrl })
         } catch (e) {
+            console.log(e)
             next(e)
         }
     }

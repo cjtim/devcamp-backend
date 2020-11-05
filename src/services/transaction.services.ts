@@ -1,5 +1,6 @@
 import { FlexMessage } from '@line/bot-sdk/dist/types'
 import { Sources } from 'omise'
+import { SCBServices } from '.'
 import { PAYMENT_METHOD } from '../enum'
 import { Orders } from '../models/order'
 import { Transactions } from '../models/transaction'
@@ -66,16 +67,8 @@ export class TransactionServices {
    
     static async getTransaction(transactionId: string) {
         try {
-            let databasePayload = await Transactions.findOne({
-                where: {
-                    transactionId: transactionId,
-                },
-            })
-            if (databasePayload?.getDataValue('method') === 'OMISE') {
-                const newCharge = await OmiseServices.getCharge(databasePayload.getDataValue('chargeId'))
-                databasePayload.setDataValue('paid', newCharge.paid)
-            }
-            databasePayload?.save()
+            let databasePayload = await Transactions.findByPk(transactionId)
+            if (!databasePayload) return
             return databasePayload?.get()
         } catch (e) {
             throw new Error('cannot transaction id not found')

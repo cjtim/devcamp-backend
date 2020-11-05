@@ -7,9 +7,7 @@ export class OrderController {
         //bug duplicate menuId, result to incorrect payAmount
         try {
             const { selectedMenu, restaurantId } = req.body
-            const menuIdList: Array<Object> = selectedMenu.map((i: any) => {
-                return i.menuId
-            })
+            const menuIdList: Array<Object> = selectedMenu.map((i: any) => i.menuId)
             const unitList: Array<number> = selectedMenu.map((i: any) => i.unit)
             const menuData = await OrderServices.create(
                 menuIdList,
@@ -19,6 +17,7 @@ export class OrderController {
             )
             res.json(menuData)
         } catch (e) {
+            console.log(e)
             next(e)
         }
     }
