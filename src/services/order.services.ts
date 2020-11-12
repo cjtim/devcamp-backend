@@ -5,15 +5,15 @@ import { Orders } from '../models/order'
 
 export class OrderServices {
     static async create(
-        menuIdList: Array<Object>,
-        unitList: Array<number>,
+        selectedMenu: Array<Object>,
         lineUid: string,
         restaurantId: string
     ) {
         try {
+            const menuIdList: Array<Object> = selectedMenu.map((i: any) => i.menuId)
             let totalAmount: number = 0
-            const response = []
-            const data = await Menus.findAll({
+            let response = []
+            const data: any = await Menus.findAll({
                 where: {
                     id: {
                         [Op.or]: menuIdList, // [{id: 'uuid'}, {id: 'uuid'}]
@@ -22,13 +22,28 @@ export class OrderServices {
                 attributes: {
                     exclude: ['createdAt', 'updatedAt', 'img'],
                 },
+                raw: true
             })
             if (!data) return { status: 'not found menu' }
-            for (let i = 0; i < data.length; i++) {
-                const item = data[i].get()
-                response.push({ ...item, payAmount: item.price * unitList[i] })
-                totalAmount = totalAmount + item.price * unitList[i]
-            }
+            let parseDataMenu: {name: string, price: number, restaurantId: string}[] = []
+            data.forEach((i: any) => {
+                parseDataMenu[i.id] = {
+                    name: i.name,
+                    price: i.price,
+                    restaurantId: i.restaurantId
+                }
+            })
+            response = selectedMenu.map((i: any) => {
+                const menuData = parseDataMenu[i.menuId]
+                const price: number = menuData.price * i.unit
+                totalAmount += price
+                return {
+                    ...i,
+                    price: menuData.price * i.unit,
+                    pricePerUnit: menuData.price,
+                }
+            })
+
             const orderPayload = await Orders.create({
                 status: ORDER_STATUS.WAIT_FOR_PAYMENT,
                 lineUid: lineUid,
