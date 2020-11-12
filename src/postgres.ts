@@ -8,9 +8,12 @@ export const sequelize = new Sequelize(
     {
         host: CONST.PSQL_HOSTNAME,
         dialect: 'postgres',
+        ssl: true,
+        dialectOptions: {
+            ssl: { require: true },
+        },
     }
 )
-
 ;(async () => {
     try {
         await sequelize.authenticate()

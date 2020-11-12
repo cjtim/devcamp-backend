@@ -3,7 +3,6 @@ dotenv.config({ path: './.env' })
 import express from 'express'
 import router from './router'
 import cors from 'cors'
-import CONST from './const'
 import { sequelize } from './postgres'
 import { errorHandle } from './utils/errorHandle'
 

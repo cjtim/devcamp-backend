@@ -41,4 +41,3 @@ dist/**/*
 yarn.lock
 .env
 firebaseServiceAcc.json
-.env
