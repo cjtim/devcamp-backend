@@ -17,7 +17,7 @@ export class TransactionServices {
     ) {
         try {
             let response: any
-            if (method === PAYMENT_METHOD.SCB_EASY) {
+            if (method === PAYMENT_METHOD.SCB) {
                 response = await Transactions.create({
                     method: method,
                     amount: payAmount,

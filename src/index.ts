@@ -12,7 +12,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 const corsOption = {
-    origin: '*',
+    origin: ['*'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,

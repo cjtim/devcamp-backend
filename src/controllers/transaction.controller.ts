@@ -10,7 +10,7 @@ export class TransactionController {
             const response = await SCBServices.createLink(payAmount)
             await Transactions.create({
                 id: response!.transactionId,
-                method: PAYMENT_METHOD.SCB_EASY,
+                method: PAYMENT_METHOD.SCB,
                 amount: payAmount,
                 lineUid: req.user.userId,
                 orderId: orderId,

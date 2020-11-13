@@ -1,11 +1,12 @@
 export enum PAYMENT_METHOD {
     OMISE = 'OMISE',
-    SCB_EASY = 'SCB',
+    SCB = 'SCB',
 }
 
 export enum ORDER_STATUS {
     WAIT_FOR_PAYMENT = 'WAIT_FOR_PAYMENT',
     COOKING = 'COOKING',
     WAIT_FOR_PICKUP = 'WAIT_FOR_PICKUP',
-    COMPLETE = 'COMPLETE'
+    COMPLETE = 'COMPLETE',
+    FAILED = 'FAILED'
 }
