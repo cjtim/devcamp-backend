@@ -1,0 +1,7 @@
+.git/
+node_modules/
+*.log
+.prettierrc
+yarn.lock
+yarn-error.log
+.gitignore

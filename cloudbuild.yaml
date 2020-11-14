@@ -1,13 +1,13 @@
 steps:
 # Add secrets .env and firebase_cert.json
-- name: gcr.io/cloud-builders/gcloud
-  entrypoint: 'bash'
-  args: 
-  - '-c'
-  - |
-    rm -f .env firebase_cert.json && \
-    gcloud secrets versions access latest --secret=env-dev-camp --format='get(payload.data)' | tr '_-' '/+' | base64 -d > .env && \
-    gcloud secrets versions access latest --secret=devcamp-firebase_cert --format='get(payload.data)' | tr '_-' '/+' | base64 -d > firebaseServiceAcc.json
+# - name: gcr.io/cloud-builders/gcloud
+#   entrypoint: 'bash'
+#   args: 
+#   - '-c'
+#   - |
+#     rm -f .env firebase_cert.json && \
+#     gcloud secrets versions access latest --secret=env-dev-camp --format='get(payload.data)' | tr '_-' '/+' | base64 -d > .env && \
+#     gcloud secrets versions access latest --secret=devcamp-firebase_cert --format='get(payload.data)' | tr '_-' '/+' | base64 -d > firebaseServiceAcc.json
 # Build
 - name: 'gcr.io/cloud-builders/docker'
   args: 

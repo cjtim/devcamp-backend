@@ -6,8 +6,8 @@ const CONSTANT = {
     OMISE_PRI_KEY: process.env.OMISE_PRIVATE_KEY || '',
     PAYMENT_RETURN_URL: 'https://liff.line.me/1655050462-nZ59d8z5/payment/success',
     BUCKET_NAME: process.env.BUCKET_NAME || '',
-    FIREBASE_ACC: require('./../firebaseServiceAcc.json'),
-    FIREBASE_DB: process.env.FIREBASE_DB || '',
+    // FIREBASE_ACC: require('./../firebaseServiceAcc.json'),
+    // FIREBASE_DB: process.env.FIREBASE_DB || '',
     SCB_PUB_KEY: process.env.SCB_API_KEY || '',
     SCB_PRI_KEY: process.env.SCB_API_SECRET_KEY || '',
     SCB_GET_TOKEN_API:
