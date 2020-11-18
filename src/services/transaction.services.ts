@@ -85,7 +85,7 @@ function receiptGenerate(
                     },
                     {
                         type: 'text',
-                        text: i.price.toString(),
+                        text: `฿${i.price.toString()}`,
                         size: 'sm',
                         color: '#111111',
                         align: 'end',
@@ -105,7 +105,7 @@ function receiptGenerate(
                 contents: [
                     {
                         type: 'text',
-                        text: 'RECEIPT',
+                        text: 'ใบเสร็จ',
                         weight: 'bold',
                         color: '#1DB446',
                         size: 'sm',
