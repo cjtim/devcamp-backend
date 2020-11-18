@@ -29,7 +29,7 @@ router.post(
     TransactionController.create
 )
 router.post('/transaction/get')
-router.post('/transaction/list')
+router.post('/transaction/list', LineMiddleware.liffVerify, TransactionController.list)
 router.post('/transaction/ispaid', LineMiddleware.liffVerify ,TransactionController.isPaid)
 
 

@@ -29,6 +29,13 @@ export class TransactionController {
             next(e)
         }
     }
+    static async list(req: Request, res: Response, next: NextFunction) {
+        try {
+            res.json(await Transactions.findAll())
+        } catch (e) {
+            next(e)
+        }
+    }
     static async isPaid(req: Request, res: Response, next: NextFunction) {
         try {
             const { transactionId } = req.body

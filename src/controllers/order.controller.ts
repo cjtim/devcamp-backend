@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { Orders } from '../models/order'
+import { Transactions } from '../models/transaction'
 import { OrderServices } from '../services'
 
 export class OrderController {
@@ -17,8 +18,8 @@ export class OrderController {
         }
     }
     static async get(req: Request, res: Response, next: NextFunction) {
-        try{
-            const {orderId} = req.body
+        try {
+            const { orderId } = req.body
             const response = await Orders.findByPk(orderId)
             if (response) res.json(response)
             else res.sendStatus(404)
@@ -27,8 +28,13 @@ export class OrderController {
         }
     }
     static async list(req: Request, res: Response, next: NextFunction) {
-        try{
-            const response = await Orders.findAll()
+        try {
+            const response = await Orders.findAll({
+                include: {
+                    model: Transactions,
+                },
+                order: [['updatedAt', 'DESC']],
+            })
             if (response) res.json(response)
             else res.sendStatus(404)
         } catch (e) {

@@ -2,6 +2,7 @@ import { DataTypes } from 'sequelize'
 import { PAYMENT_METHOD } from '../enum'
 import { sequelize } from '../postgres'
 import { enumToList } from '../utils/enumToArray'
+import { Orders } from './order'
 export const Transactions = sequelize.define(
     'Transactions',
     {
@@ -53,3 +54,9 @@ export const Transactions = sequelize.define(
         modelName: 'Transactions',
     }
 )
+Orders.hasMany(Transactions, {
+    foreignKey: 'orderId'
+})
+Transactions.belongsTo(Orders, {
+    foreignKey: 'orderId'
+})

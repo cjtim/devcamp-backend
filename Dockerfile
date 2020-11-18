@@ -3,7 +3,7 @@
 FROM node:12-alpine AS BUILD_IMAGE
 WORKDIR /usr/src/app
 COPY . .
-RUN yarn --frozen-lockfile
+RUN yarn --frozen-lockfile --production
 
 # Stage 2
 FROM node:12-alpine

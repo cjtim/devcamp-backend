@@ -37,3 +37,4 @@ export const Orders = sequelize.define(
         modelName: 'Orders',
     }
 )
+

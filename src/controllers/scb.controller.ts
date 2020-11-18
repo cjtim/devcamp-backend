@@ -1,22 +1,18 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { Transactions } from '../models/transaction'
-import { LineServices } from '../services'
+import { LineServices, TransactionServices } from '../services'
 
 export class SCBController {
-    static async webhookHandle(req: Request, res: Response) {
+    static async webhookHandle(req: Request, res: Response, next: NextFunction) {
         try {
             // save to database
             // update database
             // send message to user
             const { transactionId } = req.body
-            const database = await Transactions.findByPk(transactionId)
-            await LineServices.sendMessage(
-                database?.getDataValue('lineUid'),
-                'Transaction Complete\n ref: ' + transactionId
-            )
-            res.sendStatus(200)
+            const response = await TransactionServices.completeVerified(transactionId)
+            res.json(response)
         } catch (e) {
-            throw new Error('error with scb webhook')
+            next(e)
         }
     }
 }
