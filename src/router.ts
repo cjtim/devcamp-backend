@@ -9,7 +9,9 @@ import {
     SCBController,
     TransactionController,
 } from './controllers'
+import { LineController } from './controllers/line.controller'
 import LineMiddleware from './middleware/line.middleware'
+
 // Restaurant
 router.post('/restaurant/create', RestaurantController.create)
 router.post('/restaurant/get', RestaurantController.get)
@@ -39,9 +41,8 @@ router.post('/transaction/ispaid', LineMiddleware.liffVerify ,TransactionControl
 // Webhook
 router.post('/scb/webhook', SCBController.webhookHandle)
 router.post('/omise/webhook', OmiseController.webhookHandle)
-router.post('/line/webhook', LineMiddleware.webhookVerify, (req, res) =>
-res.status(200)
-)
+router.post('/line/webhook', LineController.webhookHandle)
+
 
 router.get('/uuid', (req, res) => res.json(uuidv4()))
 

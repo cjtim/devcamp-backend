@@ -59,4 +59,32 @@ export class LineServices {
             console.error('Cannot send message ' + e.message)
         }
     }
+    static async getContent(messageId: string): Promise<Buffer> {
+        try {
+            const stream = await client.getMessageContent(messageId)
+            return new Promise((res, rej) => {
+                let chunks: any = []
+                stream.on('data', (chunk) => {
+                    chunks.push(chunk)
+                })
+                stream.on('end', () => {
+                    var result = Buffer.concat(chunks)
+                    res(result)
+                })
+                stream.on('error', (err) => {
+                    console.log('cannot stream on')
+                    throw err
+                })
+            })
+        } catch (e) {
+            throw e
+        }
+    }
+    static async reply(replyToken: string, json: Message | Message[]) {
+        try {
+            return client.replyMessage(replyToken, json)
+        } catch (e) {
+            throw e
+        }
+    }
 }
