@@ -24,7 +24,8 @@ const CONSTANT = {
     PSQL_HOSTNAME: process.env.PSQL_HOSTNAME || '',
     PSQL_DATABASE: process.env.PSQL_DATABASE || '',
     PSQL_USERNAME: process.env.PSQL_USERNAME || '',
-    PSQL_PASSWORD: process.env.PSQL_PASSWORD || ''
+    PSQL_PASSWORD: process.env.PSQL_PASSWORD || '',
+    IMAGE_CLASSIFY_URL: process.env.IMAGE_CLASSIFY_URL || ''
 
 }
 export default CONSTANT

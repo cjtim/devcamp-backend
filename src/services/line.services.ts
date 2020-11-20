@@ -59,17 +59,16 @@ export class LineServices {
             console.error('Cannot send message ' + e.message)
         }
     }
-    static async getContent(messageId: string): Promise<Buffer> {
+    static async getBinaryContent(messageId: string): Promise<Buffer> {
         try {
             const stream = await client.getMessageContent(messageId)
             return new Promise((res, rej) => {
-                let chunks: any = []
+                let chunks: Array<Buffer> = []
                 stream.on('data', (chunk) => {
                     chunks.push(chunk)
                 })
                 stream.on('end', () => {
-                    var result = Buffer.concat(chunks)
-                    res(result)
+                    res(Buffer.concat(chunks))
                 })
                 stream.on('error', (err) => {
                     console.log('cannot stream on')

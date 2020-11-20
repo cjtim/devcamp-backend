@@ -1,4 +1,3 @@
-import * as jt from 'ts-jest'
 import request from 'supertest'
 import { sequelize } from '../src/postgres'
 import { listen as app } from '../src'
