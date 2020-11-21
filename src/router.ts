@@ -35,6 +35,7 @@ router.post('/transaction/get')
 router.post('/transaction/list', LineMiddleware.liffVerify, TransactionController.list)
 router.post('/transaction/ispaid', LineMiddleware.liffVerify ,TransactionController.isPaid)
 
+router.post('/console/isrestaurant', LineMiddleware.liffVerify, ConsoleController.isRestaurant)
 router.post('/console/activeorder', LineMiddleware.liffVerify, ConsoleController.activeOrder)
 router.post('/console/updatestatus', LineMiddleware.liffVerify, ConsoleController.updateStatus)
 

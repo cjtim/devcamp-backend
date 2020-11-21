@@ -2,13 +2,15 @@ import { Op } from 'sequelize'
 import { LineServices, OrderServices, RestaurantServices } from '.'
 import { ORDER_STATUS } from '../enum'
 import { Orders } from '../models/order'
+import { Restaurants } from '../models/restaurant'
 
 export class ConsoleServices {
-    static async getActiveOrder(restaurantId: string) {
+    static async getActiveOrder(lineUid: string) {
         try {
             const restaurant: any = await RestaurantServices.getFromLineUid(
-                restaurantId
+                lineUid
             )
+            if (!restaurant) throw new Error('This user is not restaurant')
             const response = await Orders.findAll({
                 where: {
                     restaurantId: restaurant?.id,
