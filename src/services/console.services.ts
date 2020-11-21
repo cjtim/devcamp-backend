@@ -2,7 +2,7 @@ import { Op } from 'sequelize'
 import { LineServices, OrderServices, RestaurantServices } from '.'
 import { ORDER_STATUS } from '../enum'
 import { Orders } from '../models/order'
-import { Restaurants } from '../models/restaurant'
+import { Transactions } from '../models/transaction'
 
 export class ConsoleServices {
     static async getActiveOrder(lineUid: string) {
@@ -22,6 +22,7 @@ export class ConsoleServices {
                     },
                 },
                 raw: true,
+                include: Transactions
             })
             return response
         } catch (e) {
