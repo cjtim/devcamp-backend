@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
 import { PAYMENT_METHOD } from '../enum'
 import { Transactions } from '../models/transaction'
-import { SCBServices, TransactionServices } from '../services'
+import { SCBServices } from '../services/scb.services'
+import { TransactionServices } from '../services/transaction.services'
 
 export class TransactionController {
     static async create(req: Request, res: Response, next: NextFunction) {

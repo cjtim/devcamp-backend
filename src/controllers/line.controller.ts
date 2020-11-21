@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
-import { LineServices } from '../services'
 import { ImageClassifyServices } from '../services/imageClassify.services'
+import { LineServices } from '../services/line.services'
 import { MessageGeneratorServices } from '../services/messageGenerator.services'
 
 export class LineController {

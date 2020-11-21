@@ -1,6 +1,7 @@
 import { Response, Request, NextFunction } from 'express'
 import { Restaurants } from '../models/restaurant'
-import { RestaurantServices } from '../services'
+import { RestaurantServices } from '../services/restaurant.services'
+
 
 export class RestaurantController {
     static async create(req: Request, res: Response, next: NextFunction) {
@@ -30,17 +31,17 @@ export class RestaurantController {
         }
     }
     static async get(req: Request, res: Response, next: NextFunction) {
-        try{
-            const {restaurantId} = req.body
+        try {
+            const { restaurantId } = req.body
             const response = await Restaurants.findByPk(restaurantId)
             if (response) res.json(response)
-            else res.sendStatus(404)
+            else res.sendStatus(400)
         } catch (e) {
             next(e)
         }
     }
     static async list(req: Request, res: Response, next: NextFunction) {
-        try{
+        try {
             const response = await Restaurants.findAll()
             if (response) res.json(response)
             else res.sendStatus(404)

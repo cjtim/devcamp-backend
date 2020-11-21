@@ -1,10 +1,11 @@
-import { OrderServices, SCBServices } from '.'
 import { ORDER_STATUS } from '../enum'
 import { Restaurants } from '../models/restaurant'
 import { Transactions } from '../models/transaction'
 import { ISelectedMenu } from '../type'
 import { LineServices } from './line.services'
 import { MessageGeneratorServices } from './messageGenerator.services'
+import { OrderServices } from './order.services'
+import { SCBServices } from './scb.services'
 
 export class TransactionServices {
     static async getTransaction(transactionId: string) {

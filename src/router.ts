@@ -1,16 +1,12 @@
 import { Router } from 'express'
 const router = Router({ strict: true, caseSensitive: true })
 import { v4 as uuidv4 } from 'uuid'
-import {
-    OmiseController,
-    MenuController,
-    OrderController,
-    RestaurantController,
-    SCBController,
-    TransactionController,
-} from './controllers'
-import { ConsoleController } from './controllers/console.controller'
 import { LineController } from './controllers/line.controller'
+import { MenuController } from './controllers/menu.controller'
+import { OrderController } from './controllers/order.controller'
+import { RestaurantController } from './controllers/restaurant.controller'
+import { SCBController } from './controllers/scb.controller'
+import { TransactionController } from './controllers/transaction.controller'
 import LineMiddleware from './middleware/line.middleware'
 
 // Restaurant
@@ -35,15 +31,13 @@ router.post('/transaction/get')
 router.post('/transaction/list', LineMiddleware.liffVerify, TransactionController.list)
 router.post('/transaction/ispaid', LineMiddleware.liffVerify ,TransactionController.isPaid)
 
-router.post('/console/isrestaurant', LineMiddleware.liffVerify, ConsoleController.isRestaurant)
-router.post('/console/activeorder', LineMiddleware.liffVerify, ConsoleController.activeOrder)
-router.post('/console/updatestatus', LineMiddleware.liffVerify, ConsoleController.updateStatus)
+router.post('/dashboard/activeorder', LineMiddleware.liffVerify, OrderController.activeOrder)
+router.post('/dashboard/updatestatus', LineMiddleware.liffVerify, OrderController.updateStatus)
 
 
 
 // Webhook
 router.post('/scb/webhook', SCBController.webhookHandle)
-router.post('/omise/webhook', OmiseController.webhookHandle)
 router.post('/line/webhook', LineController.webhookHandle)
 
 

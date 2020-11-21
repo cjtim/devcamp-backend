@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { LineServices } from '../services'
+import { LineServices } from '../services/line.services'
 
 export default class LineMiddleware {
     static async liffVerify(req: Request, res: Response, next: NextFunction) {

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { validate as uuidValidate } from 'uuid'
 import { Menus } from '../models/menu'
-import { MenuServices } from '../services'
+import { MenuServices } from '../services/menu.services'
 
 export class MenuController {
     static async create(req: Request, res: Response, next: NextFunction) {
