@@ -5,7 +5,7 @@ export default class LineMiddleware {
     static async liffVerify(req: Request, res: Response, next: NextFunction) {
         try {
             const accessToken = req.headers.authorization?.split(' ')[1] || ''
-            if (LineServices.isTokenValid(accessToken)) {
+            if (await LineServices.isTokenValid(accessToken)) {
                 const { lineUserId } = await LineServices.getProfile(
                     accessToken
                 )

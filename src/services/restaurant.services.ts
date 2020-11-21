@@ -20,4 +20,12 @@ export class RestaurantServices {
             lineUid: lineUid,
         })
     }
+    static async getFromLineUid(lineUid: string) {
+        const restaurant = await Restaurants.findOne({
+            where: {
+                lineUid: lineUid
+            }
+        })
+        return restaurant?.toJSON()
+    }
 }

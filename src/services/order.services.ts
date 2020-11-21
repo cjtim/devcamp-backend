@@ -10,7 +10,9 @@ export class OrderServices {
         restaurantId: string
     ) {
         try {
-            const menuIdList: Array<Object> = selectedMenu.map((i: any) => i.menuId)
+            const menuIdList: Array<Object> = selectedMenu.map(
+                (i: any) => i.menuId
+            )
             let totalAmount: number = 0
             let response = []
             const data: any = await Menus.findAll({
@@ -22,15 +24,19 @@ export class OrderServices {
                 attributes: {
                     exclude: ['createdAt', 'updatedAt', 'img'],
                 },
-                raw: true
+                raw: true,
             })
             if (!data) return { status: 'not found menu' }
-            let parseDataMenu: {name: string, price: number, restaurantId: string}[] = []
+            let parseDataMenu: {
+                name: string
+                price: number
+                restaurantId: string
+            }[] = []
             data.forEach((i: any) => {
                 parseDataMenu[i.id] = {
                     name: i.name,
                     price: i.price,
-                    restaurantId: i.restaurantId
+                    restaurantId: i.restaurantId,
                 }
             })
             response = selectedMenu.map((i: any) => {
@@ -54,5 +60,15 @@ export class OrderServices {
         } catch (e) {
             throw new Error('cannot create order ' + e.message)
         }
+    }
+    static async update(orderId: string, key: string, value: any) {
+        const order = await Orders.findOne({
+            where: {
+                id: orderId,
+            },
+        })
+        order?.setDataValue(key, value)
+        await order?.save()
+        return order?.toJSON()
     }
 }

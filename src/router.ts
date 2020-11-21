@@ -9,6 +9,7 @@ import {
     SCBController,
     TransactionController,
 } from './controllers'
+import { ConsoleController } from './controllers/console.controller'
 import { LineController } from './controllers/line.controller'
 import LineMiddleware from './middleware/line.middleware'
 
@@ -34,7 +35,8 @@ router.post('/transaction/get')
 router.post('/transaction/list', LineMiddleware.liffVerify, TransactionController.list)
 router.post('/transaction/ispaid', LineMiddleware.liffVerify ,TransactionController.isPaid)
 
-
+router.post('/console/activeorder', LineMiddleware.liffVerify, ConsoleController.activeOrder)
+router.post('/console/updatestatus', LineMiddleware.liffVerify, ConsoleController.updateStatus)
 
 
 
