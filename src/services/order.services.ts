@@ -96,7 +96,6 @@ export class OrderServices {
                 raw: true,
                 include: Transactions,
             })
-            console.log(response)
             return response
         } catch (e) {
             throw e

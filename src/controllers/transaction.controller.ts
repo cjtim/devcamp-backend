@@ -7,7 +7,7 @@ import { TransactionServices } from '../services/transaction.services'
 export class TransactionController {
     static async create(req: Request, res: Response, next: NextFunction) {
         try {
-            const { payAmount, orderId } = req.body
+            const { payAmount, orderId, bypass } = req.body
             const response = await SCBServices.createLink(payAmount)
             await Transactions.create({
                 id: response!.transactionId,
@@ -15,8 +15,12 @@ export class TransactionController {
                 amount: payAmount,
                 lineUid: req.user.userId,
                 orderId: orderId,
+                paid: bypass
             })
-            res.json({ deeplinkUrl: response!.deeplinkUrl })
+            res.json({
+                transactionId: response!.transactionId,
+                deeplinkUrl: response!.deeplinkUrl,
+            })
         } catch (e) {
             console.log(e)
             next(e)

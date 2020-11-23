@@ -19,7 +19,9 @@ export class TransactionServices {
     }
     static async isPaid(transactionId: string): Promise<boolean> {
         try {
-            return SCBServices.isPaid(transactionId)
+            const transaction = await Transactions.findByPk(transactionId)
+            return transaction.getDataValue('paid')
+            // return SCBServices.isPaid(transactionId)
         } catch (e) {
             throw new Error('cannot get transaction id ' + transactionId)
         }
@@ -27,6 +29,9 @@ export class TransactionServices {
     static async completeVerified(transactionId: string) {
         try {
             const transaction = await Transactions.findByPk(transactionId)
+            await transaction.update({
+                paid: true
+            })
             const orderId: any = transaction?.get('orderId')
             const order: any = await OrderServices.update(
                 orderId,
