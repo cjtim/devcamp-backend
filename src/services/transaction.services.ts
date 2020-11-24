@@ -5,7 +5,6 @@ import { ISelectedMenu } from '../type'
 import { LineServices } from './line.services'
 import { MessageGeneratorServices } from './messageGenerator.services'
 import { OrderServices } from './order.services'
-import { SCBServices } from './scb.services'
 
 export class TransactionServices {
     static async getTransaction(transactionId: string) {
@@ -33,7 +32,7 @@ export class TransactionServices {
                 paid: true
             })
             const orderId: any = transaction?.get('orderId')
-            const order: any = await OrderServices.update(
+            const order = await OrderServices.update(
                 orderId,
                 'status',
                 ORDER_STATUS.COOKING
@@ -50,7 +49,7 @@ export class TransactionServices {
                     restaurant?.getDataValue('address')
                 ), {
                     type: 'text',
-                    text: `${restaurant.getDataValue('name')} is cooking your order.`
+                    text: `order number ${order.id} is cooking your order.`
                 }]
             )
             return transaction?.toJSON()

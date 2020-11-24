@@ -1,4 +1,4 @@
-import { Op } from 'sequelize'
+import { Model, Op } from 'sequelize'
 import { ORDER_STATUS } from '../enum'
 import { Menus } from '../models/menu'
 import { Orders } from '../models/order'
@@ -64,7 +64,7 @@ export class OrderServices {
             throw new Error('cannot create order ' + e.message)
         }
     }
-    static async update(orderId: string, key: string, value: any) {
+    static async update(orderId: number, key: any, value: any) {
         const order = await Orders.findOne({
             where: {
                 id: orderId,
@@ -72,7 +72,7 @@ export class OrderServices {
         })
         order?.setDataValue(key, value)
         await order?.save()
-        return order?.toJSON()
+        return order
     }
     static async getActiveOrder(lineUid: string) {
         try {
@@ -102,7 +102,7 @@ export class OrderServices {
         }
     }
     static async updateStatus(
-        orderId: string,
+        orderId: number,
         statusValue: ORDER_STATUS,
         reason?: string
     ) {

@@ -1,21 +1,23 @@
-import { DataTypes } from 'sequelize'
-import { PAYMENT_METHOD } from '../enum'
+import { DataTypes, Model } from 'sequelize'
 import { sequelize } from '../postgres'
-import { enumToList } from '../utils/enumToArray'
 import { Orders } from './order'
-export const Transactions = sequelize.define(
+
+interface TransactionInstance extends Model {
+    id: string
+    paid: boolean
+    amount: number
+    discount: number
+    lineUid: string
+    orderId: string
+}
+
+export const Transactions = sequelize.define<TransactionInstance>(
     'Transactions',
     {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
-            allowNull: false,
-        },
-        method: {
-            type: DataTypes.ENUM({
-                values: enumToList(PAYMENT_METHOD),
-            }),
             allowNull: false,
         },
         paid: {
@@ -32,20 +34,16 @@ export const Transactions = sequelize.define(
             defaultValue: 0,
             allowNull: false,
         },
-        chargeId: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
         lineUid: {
             type: DataTypes.STRING,
             allowNull: false,
         },
         orderId: {
-            type: DataTypes.UUID,
+            type: DataTypes.INTEGER,
             allowNull: false,
             references: {
                 key: 'id',
-                model: 'Orders'
+                model: 'Orders',
             },
         },
     },
@@ -54,9 +52,4 @@ export const Transactions = sequelize.define(
         modelName: 'Transactions',
     }
 )
-Orders.hasMany(Transactions, {
-    foreignKey: 'orderId'
-})
-Transactions.belongsTo(Orders, {
-    foreignKey: 'orderId'
-})
+// Transactions.sync({ alter: true })

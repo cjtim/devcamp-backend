@@ -1,13 +1,22 @@
-import { DataTypes } from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 import { sequelize } from '../postgres'
-export const Menus = sequelize.define(
+
+interface MenuInstance extends Model {
+    id: string
+    name: string
+    price: number
+    img: string
+    restaurantId: string
+}
+
+export const Menus = sequelize.define<MenuInstance>(
     'Menus',
     {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             allowNull: false,
-            primaryKey: true
+            primaryKey: true,
         },
         name: {
             type: DataTypes.STRING,
@@ -26,9 +35,9 @@ export const Menus = sequelize.define(
             allowNull: false,
             references: {
                 key: 'id',
-                model: 'Restaurants'
-            }
-        }
+                model: 'Restaurants',
+            },
+        },
     },
     {
         timestamps: true,

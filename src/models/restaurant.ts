@@ -1,6 +1,17 @@
-import { DataTypes } from 'sequelize'
+import { DataTypes, Model, Optional } from 'sequelize'
 import { sequelize } from '../postgres'
-export const Restaurants = sequelize.define(
+
+interface RestaurantInstance extends Model {
+    id: string
+    name: string
+    description: string
+    address: string
+    phone: string
+    imgUrl: Array<string>
+    lineUid: string
+}
+
+export const Restaurants = sequelize.define<RestaurantInstance>(
     'Restaurants',
     {
         id: {
@@ -21,10 +32,6 @@ export const Restaurants = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        postal: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
         phone: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -36,7 +43,7 @@ export const Restaurants = sequelize.define(
         lineUid: {
             type: DataTypes.STRING,
             allowNull: false,
-        }
+        },
     },
     {
         timestamps: true,
