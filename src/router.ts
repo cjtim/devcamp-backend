@@ -12,7 +12,7 @@ import LineMiddleware from './middleware/line.middleware'
 // Restaurant
 router.post('/restaurant/create', RestaurantController.create)
 router.post('/restaurant/get', RestaurantController.get)
-router.post('/restaurant/list', LineMiddleware.liffVerify, RestaurantController.list)
+router.post('/restaurant/list', RestaurantController.list)
 router.post('/restaurant/getbylineuid', RestaurantController.getRestaurantByLineUid)
 // Menu
 router.post('/menu/create', MenuController.create)
