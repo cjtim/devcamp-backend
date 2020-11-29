@@ -21,32 +21,35 @@ export const Restaurants = sequelize.define<RestaurantInstance>(
             primaryKey: true,
         },
         name: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         description: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: true,
         },
         address: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         phone: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         imgUrl: {
-            type: DataTypes.ARRAY(DataTypes.STRING),
+            type: DataTypes.ARRAY(DataTypes.TEXT),
             allowNull: true,
         },
         lineUid: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
     },
     {
+        charset: 'utf8',
+        collate: 'utf8_unicode_ci',
         timestamps: true,
         modelName: 'Restaurants',
     }
 )
+// Restaurants.sync({alter: true})

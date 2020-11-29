@@ -30,7 +30,7 @@ export const Orders = sequelize.define<OrderInstance>(
             allowNull: false,
         },
         lineUid: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         restaurantId: {
@@ -43,6 +43,8 @@ export const Orders = sequelize.define<OrderInstance>(
         },
     },
     {
+        charset: 'utf8',
+        collate: 'utf8_unicode_ci',
         timestamps: true,
         modelName: 'Orders',
     }
@@ -54,3 +56,5 @@ Orders.hasMany(Transactions, {
 Transactions.belongsTo(Orders, {
     foreignKey: 'orderId',
 })
+
+// Orders.sync({alter: true})

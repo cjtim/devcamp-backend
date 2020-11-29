@@ -5,7 +5,6 @@ export class RestaurantServices {
         name: string,
         description: string,
         address: string,
-        postal: string,
         phone: string,
         imgUrl: Array<String>,
         lineUid: string
@@ -14,7 +13,6 @@ export class RestaurantServices {
             name: name,
             description: description,
             address: address,
-            postal: postal,
             phone: phone,
             imgUrl: imgUrl,
             lineUid: lineUid,

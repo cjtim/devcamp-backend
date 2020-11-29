@@ -12,6 +12,10 @@ export const sequelize = new Sequelize(
         dialectOptions: {
             ssl: { require: true },
         },
+        define: {
+            charset: 'utf8',
+            collate: 'utf8_general_ci',
+        }
     }
 )
 

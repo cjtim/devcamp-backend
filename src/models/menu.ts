@@ -19,7 +19,7 @@ export const Menus = sequelize.define<MenuInstance>(
             primaryKey: true,
         },
         name: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         price: {
@@ -27,7 +27,7 @@ export const Menus = sequelize.define<MenuInstance>(
             allowNull: false,
         },
         img: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: true,
         },
         restaurantId: {
@@ -40,7 +40,10 @@ export const Menus = sequelize.define<MenuInstance>(
         },
     },
     {
+        charset: 'utf8',
+        collate: 'utf8_unicode_ci',
         timestamps: true,
         modelName: 'Menus',
     }
 )
+// Menus.sync({alter: true})

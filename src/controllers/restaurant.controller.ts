@@ -10,7 +10,6 @@ export class RestaurantController {
                 name,
                 description,
                 address,
-                postal,
                 phone,
                 imgUrl,
                 lineUid,
@@ -19,7 +18,6 @@ export class RestaurantController {
                 name,
                 description,
                 address,
-                postal,
                 phone,
                 imgUrl,
                 lineUid

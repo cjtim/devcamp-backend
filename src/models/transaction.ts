@@ -35,7 +35,7 @@ export const Transactions = sequelize.define<TransactionInstance>(
             allowNull: false,
         },
         lineUid: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         orderId: {
@@ -48,6 +48,8 @@ export const Transactions = sequelize.define<TransactionInstance>(
         },
     },
     {
+        charset: 'utf8',
+        collate: 'utf8_unicode_ci',
         timestamps: true,
         modelName: 'Transactions',
     }
