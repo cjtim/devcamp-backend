@@ -21,7 +21,9 @@ export class OrderController {
     static async get(req: Request, res: Response, next: NextFunction) {
         try {
             const { orderId } = req.body
-            const response = await Orders.findByPk(orderId)
+            const response = await Orders.findByPk(orderId, {
+                include: Transactions
+            })
             if (response) res.json(response)
             else res.sendStatus(404)
         } catch (e) {
