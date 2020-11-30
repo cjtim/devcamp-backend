@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { ORDER_STATUS } from '../enum'
 import { Orders } from '../models/order'
+import { Restaurants } from '../models/restaurant'
 import { Transactions } from '../models/transaction'
 import { OrderServices } from '../services/order.services'
 
@@ -30,11 +31,13 @@ export class OrderController {
     }
     static async list(req: Request, res: Response, next: NextFunction) {
         try {
+
             const response = await Orders.findAll({
-                include: {
-                    model: Transactions,
-                },
+                include: [Transactions, Restaurants],
                 order: [['updatedAt', 'DESC']],
+                where: {
+                    lineUid: req.user.userId
+                }
             })
             if (response) res.json(response)
             else res.sendStatus(404)
@@ -75,25 +78,22 @@ export class OrderController {
             const allOrder = await Orders.findAll({
                 where: {
                     status: ORDER_STATUS.COOKING,
-                    restaurantId: order.restaurantId
+                    restaurantId: order.restaurantId,
                 },
-                raw: true
+                raw: true,
             })
             let queue = 1
-            let response = allOrder.map(order => {
+            let response = allOrder.map((order) => {
                 return {
                     ...order,
-                    queue: queue += 1
+                    queue: (queue += 1),
                 }
             })
-            let orderqueue = response.filter(i => i.id === orderId)
+            let orderqueue = response.filter((i) => i.id === orderId)
 
             // if exist
-            if(!orderqueue) res.json(orderqueue[0])
+            if (!orderqueue) res.json(orderqueue[0])
             else res.json({ queue: 0 })
-
-        } catch (e) {
-
-        }
+        } catch (e) {}
     }
 }

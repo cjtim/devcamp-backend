@@ -20,8 +20,8 @@ router.post('/menu/get', MenuController.get)
 router.post('/menu/list', MenuController.list)
 // Order
 router.post('/order/create', LineMiddleware.liffVerify, OrderController.create)
-router.post('/order/get', OrderController.get)
-router.post('/order/list', OrderController.list)
+router.post('/order/get', LineMiddleware.liffVerify, OrderController.get)
+router.post('/order/list', LineMiddleware.liffVerify, OrderController.list)
 router.post('/order/queue', OrderController.queue)
 // Transaction
 router.post(

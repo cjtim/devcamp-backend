@@ -2,6 +2,7 @@ import { DataTypes, Model, Optional } from 'sequelize'
 import { ORDER_STATUS } from '../enum'
 import { sequelize } from '../postgres'
 import { enumToList } from '../utils/enumToArray'
+import { Restaurants } from './restaurant'
 import { Transactions } from './transaction'
 
 interface OrderInstance extends Model {
@@ -49,6 +50,11 @@ export const Orders = sequelize.define<OrderInstance>(
         modelName: 'Orders',
     }
 )
+
+
+Orders.belongsTo(Restaurants, {
+    foreignKey: 'restaurantId'
+})
 
 Orders.hasMany(Transactions, {
     foreignKey: 'orderId',
