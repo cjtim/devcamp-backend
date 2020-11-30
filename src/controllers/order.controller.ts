@@ -21,11 +21,9 @@ export class OrderController {
     static async get(req: Request, res: Response, next: NextFunction) {
         try {
             const { orderId } = req.body
-            const response = await Orders.findByPk(orderId, {
-                include: Transactions
-            })
-            if (response) res.json(response)
-            else res.sendStatus(404)
+            const order = await Orders.findByPk(orderId)
+            if (!order) res.sendStatus(400)
+            res.json(order)
         } catch (e) {
             next(e)
         }
@@ -65,6 +63,37 @@ export class OrderController {
         } catch (e) {
             console.log(e)
             next(e)
+        }
+    }
+    static async queue(req: Request, res: Response, next: NextFunction) {
+        try {
+            const orderId = req.body.orderId
+            const order = await Orders.findByPk(orderId, { raw: true })
+            console.log(order)
+            if (!order) res.sendStatus(400)
+
+            const allOrder = await Orders.findAll({
+                where: {
+                    status: ORDER_STATUS.COOKING,
+                    restaurantId: order.restaurantId
+                },
+                raw: true
+            })
+            let queue = 1
+            let response = allOrder.map(order => {
+                return {
+                    ...order,
+                    queue: queue += 1
+                }
+            })
+            let orderqueue = response.filter(i => i.id === orderId)
+
+            // if exist
+            if(!orderqueue) res.json(orderqueue[0])
+            else res.json({ queue: 0 })
+
+        } catch (e) {
+
         }
     }
 }
