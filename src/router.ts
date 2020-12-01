@@ -1,6 +1,7 @@
 import { Router } from 'express'
 const router = Router({ strict: true, caseSensitive: true })
 import { v4 as uuidv4 } from 'uuid'
+import { DashboardController } from './controllers/dashboard.controller'
 import { LineController } from './controllers/line.controller'
 import { MenuController } from './controllers/menu.controller'
 import { OrderController } from './controllers/order.controller'
@@ -41,6 +42,7 @@ router.post('/transaction/ispaid', LineMiddleware.liffVerify ,TransactionControl
 
 router.post('/dashboard/activeorder', LineMiddleware.liffVerify, OrderController.activeOrder)
 router.post('/dashboard/updatestatus', LineMiddleware.liffVerify, OrderController.updateStatus)
+router.post('/dashboard/summary', LineMiddleware.liffVerify, DashboardController.summary)
 
 
 
