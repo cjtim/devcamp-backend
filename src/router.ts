@@ -18,6 +18,7 @@ router.post('/restaurant/getbylineuid', RestaurantController.getRestaurantByLine
 router.post('/menu/create', MenuController.create)
 router.post('/menu/get', MenuController.get)
 router.post('/menu/list', MenuController.list)
+router.post('/menu/search', MenuController.search)
 // Order
 router.post('/order/create', LineMiddleware.liffVerify, OrderController.create)
 router.post('/order/get', LineMiddleware.liffVerify, OrderController.get)

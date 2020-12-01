@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
+import { Op } from 'sequelize'
 import { validate as uuidValidate } from 'uuid'
 import { Menus } from '../models/menu'
 import { MenuServices } from '../services/menu.services'
@@ -40,6 +41,22 @@ export class MenuController {
             })
             if (response) res.json(response)
             else res.sendStatus(404)
+        } catch (e) {
+            next(e)
+        }
+    }
+    static async search(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { name, restaurantId } = req.body
+            const menu = await Menus.findAll({
+                where: {
+                    name: {
+                        [Op.substring]: name,
+                    },
+                    restaurantId: restaurantId,
+                },
+            })
+            res.json(menu)
         } catch (e) {
             next(e)
         }
