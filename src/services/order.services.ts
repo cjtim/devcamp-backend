@@ -2,6 +2,7 @@ import { Model, Op } from 'sequelize'
 import { ORDER_STATUS } from '../enum'
 import { Menus } from '../models/menu'
 import { Orders } from '../models/order'
+import { Restaurants } from '../models/restaurant'
 import { Transactions } from '../models/transaction'
 import { LineServices } from './line.services'
 import { RestaurantServices } from './restaurant.services'
@@ -94,7 +95,7 @@ export class OrderServices {
                     ],
                 },
                 raw: true,
-                include: Transactions,
+                include: [Transactions, Restaurants],
             })
             return response
         } catch (e) {
