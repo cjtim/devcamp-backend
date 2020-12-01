@@ -7,8 +7,13 @@ import { OrderController } from './controllers/order.controller'
 import { RestaurantController } from './controllers/restaurant.controller'
 import { SCBController } from './controllers/scb.controller'
 import { TransactionController } from './controllers/transaction.controller'
+import { UserController } from './controllers/user.controller'
 import LineMiddleware from './middleware/line.middleware'
 
+
+// User
+router.post('/user/update', LineMiddleware.liffVerify, UserController.update)
+router.post('/user/get', LineMiddleware.liffVerify, UserController.get)
 // Restaurant
 router.post('/restaurant/create', RestaurantController.create)
 router.post('/restaurant/get', RestaurantController.get)
