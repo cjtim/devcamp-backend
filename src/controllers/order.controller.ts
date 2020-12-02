@@ -71,10 +71,9 @@ export class OrderController {
     }
     static async queue(req: Request, res: Response, next: NextFunction) {
         try {
-            const orderId = req.body.orderId
+            const { orderId } = req.body
             const order = await Orders.findByPk(orderId, { raw: true })
-            console.log(order)
-            if (!order) res.sendStatus(400)
+            if (!order) return res.sendStatus(400)
 
             const allOrder = await Orders.findAll({
                 where: {
@@ -83,18 +82,16 @@ export class OrderController {
                 },
                 raw: true,
             })
-            let queue = 1
-            let response = allOrder.map((order) => {
-                return {
-                    ...order,
-                    queue: (queue += 1),
-                }
-            })
-            let orderqueue = response.filter((i) => i.id === orderId)
 
-            // if exist
-            if (!orderqueue) res.json(orderqueue[0])
-            else res.json({ queue: 0 })
-        } catch (e) {}
+            allOrder.reduce((queue, currentOrder) => {
+                if (currentOrder.id == orderId) res.json({ queue: queue })
+                return queue + 1
+            }, 1)
+            // if cannot find match cooking order
+            if (!res.headersSent)
+                res.json({ queue: 0, message: 'order is not cooking' })
+        } catch (e) {
+            next(e)
+        }
     }
 }
