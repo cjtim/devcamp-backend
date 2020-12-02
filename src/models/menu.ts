@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize'
 import { sequelize } from '../postgres'
+import { Restaurants } from './restaurant'
 
 interface MenuInstance extends Model {
     id: string
@@ -46,4 +47,9 @@ export const Menus = sequelize.define<MenuInstance>(
         modelName: 'Menus',
     }
 )
+Menus.belongsTo(Restaurants, {
+    foreignKey: {
+        field: 'restaurantId'
+    }
+})
 // Menus.sync({alter: true})

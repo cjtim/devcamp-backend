@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { Op } from 'sequelize'
 import { validate as uuidValidate } from 'uuid'
 import { Menus } from '../models/menu'
+import { Restaurants } from '../models/restaurant'
 import { MenuServices } from '../services/menu.services'
 
 export class MenuController {
@@ -58,6 +59,19 @@ export class MenuController {
             })
             res.json(menu)
         } catch (e) {
+            next(e)
+        }
+    }
+
+    static async random(req: Request, res: Response, next: NextFunction){
+        try{
+            const menu = await Menus.findAll({
+                include: Restaurants
+            })
+            if(!menu) res.status(400) 
+            const selected = menu[Math.floor(Math.random() * menu.length)]
+            res.json(selected)
+        } catch (e){
             next(e)
         }
     }

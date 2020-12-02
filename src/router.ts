@@ -25,6 +25,7 @@ router.post('/menu/create', MenuController.create)
 router.post('/menu/get', MenuController.get)
 router.post('/menu/list', MenuController.list)
 router.post('/menu/search', MenuController.search)
+router.post('/menu/random', MenuController.random)
 // Order
 router.post('/order/create', LineMiddleware.liffVerify, OrderController.create)
 router.post('/order/get', LineMiddleware.liffVerify, OrderController.get)
@@ -43,7 +44,6 @@ router.post('/transaction/ispaid', LineMiddleware.liffVerify ,TransactionControl
 router.post('/dashboard/activeorder', LineMiddleware.liffVerify, OrderController.activeOrder)
 router.post('/dashboard/updatestatus', LineMiddleware.liffVerify, OrderController.updateStatus)
 router.post('/dashboard/summary', LineMiddleware.liffVerify, DashboardController.summary)
-
 
 
 // Webhook
