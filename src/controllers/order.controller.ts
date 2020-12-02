@@ -22,7 +22,9 @@ export class OrderController {
     static async get(req: Request, res: Response, next: NextFunction) {
         try {
             const { orderId } = req.body
-            const order = await Orders.findByPk(orderId)
+            const order = await Orders.findByPk(orderId, {
+                include: [Transactions, Restaurants],
+            })
             if (!order) res.sendStatus(400)
             res.json(order)
         } catch (e) {
@@ -31,13 +33,12 @@ export class OrderController {
     }
     static async list(req: Request, res: Response, next: NextFunction) {
         try {
-
             const response = await Orders.findAll({
                 include: [Transactions, Restaurants],
                 order: [['updatedAt', 'DESC']],
                 where: {
-                    lineUid: req.user.userId
-                }
+                    lineUid: req.user.userId,
+                },
             })
             if (response) res.json(response)
             else res.sendStatus(404)
@@ -70,11 +71,16 @@ export class OrderController {
     }
     static async queue(req: Request, res: Response, next: NextFunction) {
         try {
-            const orderId = req.body.orderId
+            const { orderId } = req.body
             const order = await Orders.findByPk(orderId, { raw: true })
-            console.log(order)
-            if (!order) res.sendStatus(400)
+            if (!order) return res.sendStatus(400)
 
+            if (order.status != ORDER_STATUS.COOKING) {
+                res.json({
+                    queue: 0,
+                    message: order.status
+                })
+            }
             const allOrder = await Orders.findAll({
                 where: {
                     status: ORDER_STATUS.COOKING,
@@ -82,18 +88,16 @@ export class OrderController {
                 },
                 raw: true,
             })
-            let queue = 1
-            let response = allOrder.map((order) => {
-                return {
-                    ...order,
-                    queue: (queue += 1),
-                }
-            })
-            let orderqueue = response.filter((i) => i.id === orderId)
 
-            // if exist
-            if (!orderqueue) res.json(orderqueue[0])
-            else res.json({ queue: 0 })
-        } catch (e) {}
+            allOrder.reduce((queue, currentOrder) => {
+                if (currentOrder.id == orderId) res.json({ queue: queue })
+                return queue + 1
+            }, 1)
+            // if cannot find match cooking order
+            if (!res.headersSent)
+                res.json({ queue: 0, message: '' })
+        } catch (e) {
+            next(e)
+        }
     }
 }
