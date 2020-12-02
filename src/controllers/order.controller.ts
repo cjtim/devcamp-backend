@@ -75,6 +75,12 @@ export class OrderController {
             const order = await Orders.findByPk(orderId, { raw: true })
             if (!order) return res.sendStatus(400)
 
+            if (order.status != ORDER_STATUS.COOKING) {
+                res.json({
+                    queue: 0,
+                    message: order.status
+                })
+            }
             const allOrder = await Orders.findAll({
                 where: {
                     status: ORDER_STATUS.COOKING,
@@ -89,7 +95,7 @@ export class OrderController {
             }, 1)
             // if cannot find match cooking order
             if (!res.headersSent)
-                res.json({ queue: 0, message: 'order is not cooking' })
+                res.json({ queue: 0, message: '' })
         } catch (e) {
             next(e)
         }
