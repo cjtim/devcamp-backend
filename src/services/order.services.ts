@@ -1,10 +1,12 @@
 import { Model, Op } from 'sequelize'
+import { values } from 'sequelize/types/lib/operators'
 import { ORDER_STATUS } from '../enum'
 import { Menus } from '../models/menu'
 import { Orders } from '../models/order'
 import { Restaurants } from '../models/restaurant'
 import { Transactions } from '../models/transaction'
 import { LineServices } from './line.services'
+import { MessageGeneratorServices } from './messageGenerator.services'
 import { RestaurantServices } from './restaurant.services'
 
 export class OrderServices {
@@ -70,6 +72,7 @@ export class OrderServices {
             where: {
                 id: orderId,
             },
+            include: [Transactions]
         })
         order?.setDataValue(key, value)
         await order?.save()
@@ -108,23 +111,44 @@ export class OrderServices {
         reason?: string
     ) {
         const order: any = await this.update(orderId, 'status', statusValue)
+        console.log(order.toJSON())
         if (statusValue == ORDER_STATUS.COOKING) {
-            LineServices.sendMessage(order.lineUid, 'Your order is cooking')
+
+            const tips = {
+                0:'tips : การข้ามอาหารมื้อเช้าอาจนำไปสู่ความหิวแบบไม่มีที่สิ้นสุด!!',
+                1:'tips : ผู้ใหญ่ควรดื่มน้ำอย่างน้อย 1.5 - 2 ลิตรต่อวัน หรือมากกว่านั้นถ้าร้อนหรือต้องใช้กำลังมาก',
+                2: 'tips : ไขมันส่วนเกินจากร่างกายมาจากการกินของกินมากยิ่งกว่าแคลอรี่ที่ร่างกายต้องการ อาจมาได้จากของกินหลายแหล่ง อย่างเช่น โปรตีน ไขมัน คาร์โบไฮเดรต หรือแอลกอฮอล์',
+                3: 'tips : อะโวคาโด อุดมไปด้วยไขมันไม่อิ่มตัวเชิงเดี่ยว ที่ช่วยลดความอยากอาหารลงเยอะมากๆ !!!',
+                4: 'tips : พาสต้า & ขนมปัง มีใยอาหาร และ โปรตีน จะทำให้อยู่ท้องไปอีกนานเลยแหละ'
+            }
+        
+            let randomNum = Math.floor(Math.random() * 5 )
+
+           
+            
+
+            LineServices.sendMessageRaw(order.lineUid, MessageGeneratorServices.cookingOrder(order.id, tips[randomNum]))
+
+
         } else if (statusValue == ORDER_STATUS.WAIT_FOR_PICKUP) {
-            LineServices.sendMessage(
-                order.lineUid,
-                'Your order is ready to pickup'
-            )
+            let summaryOrderFormart = order.selectedMenu.length + ' จาน , ราคา ' + order.Transactions[0].amount + ' บาท'
+            let summaryFoodNameFormart =''
+            order.selectedMenu.map(values => {
+                return summaryFoodNameFormart += values.name + ' / '
+            })
+            LineServices.sendMessageRaw(order.lineUid, MessageGeneratorServices.updateOrder(order.id,summaryOrderFormart,summaryFoodNameFormart))
+            // LineServices.sendMessage(
+            //     order.lineUid,
+            //     'Your order is ready to pickup'
+            // )
         } else if (statusValue == ORDER_STATUS.COMPLETE) {
-            LineServices.sendMessage(
-                order.lineUid,
-                'Thank you, enjoy your meal.'
-            )
+            LineServices.sendMessageRaw(order.lineUid, MessageGeneratorServices.completeOrder(order.id, 'โอกาสหน้าเชิญ ใช้บริการใหม่'))
+
         } else if (statusValue == ORDER_STATUS.FAILED) {
-            LineServices.sendMessage(
-                order.lineUid,
-                `Your order has been cancel due to ${reason}.`
-            )
+
+            LineServices.sendMessageRaw(order.lineUid, MessageGeneratorServices.cancelOrder(order.id, `Your order has been cancel due to ${reason}.`))
+
+
             // refund money
         }
         return order

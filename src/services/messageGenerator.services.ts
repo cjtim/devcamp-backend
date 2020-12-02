@@ -10,7 +10,7 @@ export class MessageGeneratorServices {
     ): FlexMessage {
         let totalPrice: number = 0
         let totalUnit: number = 0
-        const body: Array<FlexBox> = selectedMenu.map(
+        const body = selectedMenu.map(
             (i: ISelectedMenu): FlexBox => {
                 totalPrice += i.price
                 totalUnit += i.unit
@@ -212,6 +212,484 @@ export class MessageGeneratorServices {
                     footer: {
                         separator: true,
                     },
+                },
+            },
+        }
+    }
+
+    static cancelOrder(orderId: number , tipForCustomer : string): FlexMessage {
+        return {
+            type: 'flex',
+            altText: 'Receipt',
+            contents: {
+                type: 'bubble',
+                header: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'box',
+                            layout: 'horizontal',
+                            contents: [
+                                {
+                                    type: 'image',
+                                    url:
+                                        'https://cdn2.iconfinder.com/data/icons/bitsies/128/Cancel-512.png',
+                                    size: 'full',
+                                    aspectMode: 'fit',
+                                    aspectRatio: '190:196',
+                                    gravity: 'center',
+                                    flex: 1,
+                                    offsetStart: 'md'
+                                },
+                                    
+                                {
+                                    type: 'box',
+                                    layout: 'horizontal',
+                                    contents: [
+                                        {
+                                            type: 'text',
+                                            text: 'ORDER ' + orderId,
+                                            size: 'xs',
+                                            color: '#ffffff',
+                                            align: 'center',
+                                            gravity: 'center',
+                                        },
+                                    ],
+                                    backgroundColor: '#EC3D44',
+                                    paddingAll: '2px',
+                                    paddingStart: '4px',
+                                    paddingEnd: '4px',
+                                    flex: 0,
+                                    position: 'absolute',
+                                    offsetStart: '18px',
+                                    offsetTop: '18px',
+                                    cornerRadius: '100px',
+                                    width: '90px',
+                                    height: '25px',
+                                },
+                            ],
+                        },
+                    ],
+                    paddingAll: '0px',
+                },
+                body: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                {
+                                    type: 'box',
+                                    layout: 'vertical',
+                                    contents: [
+                                        {
+                                            type: 'text',
+                                            contents: [],
+                                            size: 'xl',
+                                            wrap: true,
+                                            text: 'ออเดอร์ถูกยกเลิก',
+                                            color: '#ffffff',
+                                            weight: 'bold',
+                                        },
+                                    ],
+                                    spacing: 'sm',
+                                },
+                                {
+                                    type: 'box',
+                                    layout: 'vertical',
+                                    contents: [
+                                        {
+                                            type: 'box',
+                                            layout: 'vertical',
+                                            contents: [
+                                                {
+                                                    type: 'text',
+                                                    contents: [],
+                                                    size: 'sm',
+                                                    wrap: true,
+                                                    margin: 'lg',
+                                                    color: '#ffffffde',
+                                                    text:
+                                                        tipForCustomer,
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                    paddingAll: '13px',
+                                    backgroundColor: '#ffffff1A',
+                                    cornerRadius: '2px',
+                                    margin: 'xl',
+                                },
+                            ],
+                        },
+                    ],
+                    paddingAll: '20px',
+                    backgroundColor: '#464F69',
+                },
+            },
+        }
+    }
+
+
+    static completeOrder(orderId: number , tipForCustomer : string): FlexMessage {
+        return {
+            type: 'flex',
+            altText: 'Receipt',
+            contents: {
+                type: 'bubble',
+                header: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'box',
+                            layout: 'horizontal',
+                            contents: [
+                                {
+                                    type: 'image',
+                                    url:
+                                        'https://cdn3.iconfinder.com/data/icons/street-food-and-food-trucker-1/64/shrimp-fried-rice-food-dish-512.png',
+                                    size: 'full',
+                                    aspectMode: 'fit',
+                                    aspectRatio: '190:196',
+                                    gravity: 'center',
+                                    flex: 1,
+                                    offsetStart: 'md'
+                                },
+                                    
+                                {
+                                    type: 'box',
+                                    layout: 'horizontal',
+                                    contents: [
+                                        {
+                                            type: 'text',
+                                            text: 'ORDER ' + orderId,
+                                            size: 'xs',
+                                            color: '#ffffff',
+                                            align: 'center',
+                                            gravity: 'center',
+                                        },
+                                    ],
+                                    backgroundColor: '#EC3D44',
+                                    paddingAll: '2px',
+                                    paddingStart: '4px',
+                                    paddingEnd: '4px',
+                                    flex: 0,
+                                    position: 'absolute',
+                                    offsetStart: '18px',
+                                    offsetTop: '18px',
+                                    cornerRadius: '100px',
+                                    width: '90px',
+                                    height: '25px',
+                                },
+                            ],
+                        },
+                    ],
+                    paddingAll: '0px',
+                },
+                body: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                {
+                                    type: 'box',
+                                    layout: 'vertical',
+                                    contents: [
+                                        {
+                                            type: 'text',
+                                            contents: [],
+                                            size: 'xl',
+                                            wrap: true,
+                                            text: 'ขอบคุณที่อุดหนุน ทานอาหารให้อร่อยครับ',
+                                            color: '#ffffff',
+                                            weight: 'bold',
+                                        },
+                                    ],
+                                    spacing: 'sm',
+                                },
+                                {
+                                    type: 'box',
+                                    layout: 'vertical',
+                                    contents: [
+                                        {
+                                            type: 'box',
+                                            layout: 'vertical',
+                                            contents: [
+                                                {
+                                                    type: 'text',
+                                                    contents: [],
+                                                    size: 'sm',
+                                                    wrap: true,
+                                                    margin: 'lg',
+                                                    color: '#ffffffde',
+                                                    text:
+                                                        tipForCustomer,
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                    paddingAll: '13px',
+                                    backgroundColor: '#ffffff1A',
+                                    cornerRadius: '2px',
+                                    margin: 'xl',
+                                },
+                            ],
+                        },
+                    ],
+                    paddingAll: '20px',
+                    backgroundColor: '#464F69',
+                },
+            },
+        }
+    }
+
+    static cookingOrder(orderId: number , tipForCustomer : string): FlexMessage {
+        return {
+            type: 'flex',
+            altText: 'Receipt',
+            contents: {
+                type: 'bubble',
+                header: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'box',
+                            layout: 'horizontal',
+                            contents: [
+                                {
+                                    type: 'image',
+                                    url:
+                                        'https://cdn2.iconfinder.com/data/icons/people-at-home-scenes/64/cooking-512.png',
+                                    size: 'full',
+                                    aspectMode: 'fit',
+                                    aspectRatio: '190:196',
+                                    gravity: 'center',
+                                    flex: 1,
+                                    offsetStart: 'md'
+                                },
+                                    
+                                {
+                                    type: 'box',
+                                    layout: 'horizontal',
+                                    contents: [
+                                        {
+                                            type: 'text',
+                                            text: 'ORDER ' + orderId,
+                                            size: 'xs',
+                                            color: '#ffffff',
+                                            align: 'center',
+                                            gravity: 'center',
+                                        },
+                                    ],
+                                    backgroundColor: '#EC3D44',
+                                    paddingAll: '2px',
+                                    paddingStart: '4px',
+                                    paddingEnd: '4px',
+                                    flex: 0,
+                                    position: 'absolute',
+                                    offsetStart: '18px',
+                                    offsetTop: '18px',
+                                    cornerRadius: '100px',
+                                    width: '90px',
+                                    height: '25px',
+                                },
+                            ],
+                        },
+                    ],
+                    paddingAll: '0px',
+                },
+                body: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                {
+                                    type: 'box',
+                                    layout: 'vertical',
+                                    contents: [
+                                        {
+                                            type: 'text',
+                                            contents: [],
+                                            size: 'xl',
+                                            wrap: true,
+                                            text: 'ร้านกำลังจัดเตรียมอาหาร ให้กับคุณ',
+                                            color: '#ffffff',
+                                            weight: 'bold',
+                                        },
+                                        {
+                                            type: 'text',
+                                            text: 'กรุณารอสักครู่',
+                                            color: '#ffffffcc',
+                                            size: 'sm',
+                                        },
+                                    ],
+                                    spacing: 'sm',
+                                },
+                                {
+                                    type: 'box',
+                                    layout: 'vertical',
+                                    contents: [
+                                        {
+                                            type: 'box',
+                                            layout: 'vertical',
+                                            contents: [
+                                                {
+                                                    type: 'text',
+                                                    contents: [],
+                                                    size: 'sm',
+                                                    wrap: true,
+                                                    margin: 'lg',
+                                                    color: '#ffffffde',
+                                                    text:
+                                                        tipForCustomer,
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                    paddingAll: '13px',
+                                    backgroundColor: '#ffffff1A',
+                                    cornerRadius: '2px',
+                                    margin: 'xl',
+                                },
+                            ],
+                        },
+                    ],
+                    paddingAll: '20px',
+                    backgroundColor: '#464F69',
+                },
+            },
+        }
+    }
+
+
+    static updateOrder(orderId: number, summaryOrder: string , summaryFoodName : string): FlexMessage {
+        return {
+            type: 'flex',
+            altText: 'Receipt',
+            contents: {
+                type: 'bubble',
+                header: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'box',
+                            layout: 'horizontal',
+                            contents: [
+                                {
+                                    type: 'image',
+                                    url:
+                                        'https://cdn0.iconfinder.com/data/icons/food-delivery-26/512/take_away-hold-give-bag-512.png',
+                                    size: 'full',
+                                    aspectMode: 'fit',
+                                    aspectRatio: '190:196',
+                                    gravity: 'center',
+                                    flex: 1,
+                                    offsetStart: 'md'
+                                },
+                                    
+                                {
+                                    type: 'box',
+                                    layout: 'horizontal',
+                                    contents: [
+                                        {
+                                            type: 'text',
+                                            text: 'ORDER ' + orderId,
+                                            size: 'xs',
+                                            color: '#ffffff',
+                                            align: 'center',
+                                            gravity: 'center',
+                                        },
+                                    ],
+                                    backgroundColor: '#EC3D44',
+                                    paddingAll: '2px',
+                                    paddingStart: '4px',
+                                    paddingEnd: '4px',
+                                    flex: 0,
+                                    position: 'absolute',
+                                    offsetStart: '18px',
+                                    offsetTop: '18px',
+                                    cornerRadius: '100px',
+                                    width: '90px',
+                                    height: '25px',
+                                },
+                            ],
+                        },
+                    ],
+                    paddingAll: '0px',
+                },
+                body: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'box',
+                            layout: 'vertical',
+                            contents: [
+                                {
+                                    type: 'box',
+                                    layout: 'vertical',
+                                    contents: [
+                                        {
+                                            type: 'text',
+                                            contents: [],
+                                            size: 'xl',
+                                            wrap: true,
+                                            text: 'อาหารของคุณพร้อมแล้ว',
+                                            color: '#ffffff',
+                                            weight: 'bold',
+                                        },
+                                        {
+                                            type: 'text',
+                                            text: summaryOrder,
+                                            color: '#ffffffcc',
+                                            size: 'sm',
+                                        },
+                                    ],
+                                    spacing: 'sm',
+                                },
+                                {
+                                    type: 'box',
+                                    layout: 'vertical',
+                                    contents: [
+                                        {
+                                            type: 'box',
+                                            layout: 'vertical',
+                                            contents: [
+                                                {
+                                                    type: 'text',
+                                                    contents: [],
+                                                    size: 'sm',
+                                                    wrap: true,
+                                                    margin: 'lg',
+                                                    color: '#ffffffde',
+                                                    text:
+                                                        summaryFoodName,
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                    paddingAll: '13px',
+                                    backgroundColor: '#ffffff1A',
+                                    cornerRadius: '2px',
+                                    margin: 'xl',
+                                },
+                            ],
+                        },
+                    ],
+                    paddingAll: '20px',
+                    backgroundColor: '#464F69',
                 },
             },
         }
